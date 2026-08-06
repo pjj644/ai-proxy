@@ -1,6 +1,5 @@
 node_modules/
 dist/
 .env
-checkpoints.sqlite
-checkpoints.sqlite-journal
+checkpoints.sqlite*
 *.log
