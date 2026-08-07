@@ -4,12 +4,14 @@ import { HumanMessage } from '@langchain/core/messages'
 import { Command } from '@langchain/langgraph'
 import { graph, ToolResultInput } from './graph'
 import { getToolMeta } from './tools'
+import { registry } from './registry'
 
 const app = express()
 app.use(express.json({ limit: '8mb' }))
 
 const PORT: number = parseInt(process.env.PORT || '3000', 10)
 const PROXY_AUTH_KEY: string = process.env.PROXY_AUTH_KEY || ''
+const TOOL_TIMEOUT_MS: number = parseInt(process.env.TOOL_TIMEOUT_MS || '30000', 10)
 
 export function checkAuth(req: Request, res: Response): boolean {
   const key: string = (req.headers['x-proxy-key'] as string) || ''
@@ -30,40 +32,6 @@ interface ToolCallReq {
   args: Record<string, unknown>
 }
 
-// ============ 阶段1：mock 执行器（自动回假数据，不接手机）============
-function mockDataFor(name: string, args: Record<string, unknown>): string {
-  switch (name) {
-    case 'query_today_courses':
-      return JSON.stringify({
-        count: 2,
-        courses: [
-          { name: '高等数学', time: '第1-2节 (08:00-09:40)', room: '品学楼A101', teacher: '张老师' },
-          { name: '大学英语', time: '第3-4节 (10:00-11:40)', room: '品学楼B203', teacher: '李老师' },
-        ],
-      })
-    case 'query_current_week':
-      return JSON.stringify({ currentWeek: 5, totalWeeks: 20 })
-    case 'query_next_exam':
-      return JSON.stringify({
-        courseName: '数据结构', examDate: '2026-08-15', examTimeRange: '14:00-16:00',
-        examLocation: '品学楼C301', seatNo: '12', examType: '期末', countdown: '9天',
-      })
-    case 'query_gpa':
-      return JSON.stringify({ overallGPA: '3.62', latestSemesterGPA: '3.81', latestSemesterId: 503, totalCourses: 28 })
-    case 'check_login_status':
-      return JSON.stringify({ isLoggedIn: true, email: 'test@uestc.edu.cn' })
-    case 'has_course_data':
-      return JSON.stringify({ hasCourseData: true })
-    default:
-      return JSON.stringify({ mock: true, name, args, message: 'mock result (phase 1)' })
-  }
-}
-
-function mockExecute(tc: ToolCallReq): ToolResultInput {
-  return { tool_call_id: tc.id, success: true, data: mockDataFor(tc.name, tc.args) }
-}
-// =====================================================================
-
 app.post('/api/chat', async (req: Request, res: Response) => {
   if (!checkAuth(req, res)) return
   const { session_id, message } = req.body || {}
@@ -71,7 +39,8 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     res.status(400).json({ error: 'session_id and message are required' })
     return
   }
-  const config = { configurable: { thread_id: session_id as string }, recursionLimit: 25 }
+  const sessionId: string = String(session_id)
+  const config = { configurable: { thread_id: sessionId }, recursionLimit: 25 }
   res.setHeader('Content-Type', 'text/event-stream')
   res.setHeader('Cache-Control', 'no-cache')
   res.setHeader('Connection', 'keep-alive')
@@ -85,12 +54,23 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     }
   }
 
+  // 客户端断开时清理挂起的工具结果（registry 返回 null -> 调用方用错误结果 resume）。
+  // 注意：用 res.on('close') 而非 req.on('close')--后者在请求体读完后就会触发，不代表断开。
+  let clientClosed = false
+  let finished = false
+  res.on('close', () => {
+    if (!finished) {
+      clientClosed = true
+      registry.cleanup(sessionId)
+      console.log(`[chat] session=${sessionId} client disconnected mid-turn`)
+    }
+  })
+
   let input: any = { messages: [new HumanMessage(String(message))] }
   try {
     while (true) {
       const stream = await graph.stream(input, { ...config, streamMode: ['messages'] })
       for await (const chunk of stream) {
-        // ['messages'] 模式下 chunk 形如 ['messages', [AIMessageChunk, metadata]]
         let msgChunk: { _getType?: () => string; content?: unknown } | undefined
         if (Array.isArray(chunk)) {
           if (typeof chunk[0] === 'string') {
@@ -109,44 +89,68 @@ app.post('/api/chat', async (req: Request, res: Response) => {
         }
       }
 
-      // 流结束后检查是否在中断点等待工具回传
+      // 流结束，检查是否在中断点等待手机回传
       const state = await graph.getState(config)
       const pendingTask = (state.tasks || []).find((t) => t.interrupts && t.interrupts.length > 0)
-      if (pendingTask) {
-        const interruptValue = pendingTask.interrupts![0].value as { toolCalls?: ToolCallReq[] }
-        const toolCalls: ToolCallReq[] = (interruptValue?.toolCalls || []).map((tc) => ({
-          id: tc.id, name: tc.name, args: tc.args,
-        }))
-        const batch_id = `b-${Date.now()}`
-        const toolCallsWithMeta = toolCalls.map((tc) => {
-          const meta = getToolMeta(tc.name)
-          return {
-            tool_call_id: tc.id, name: tc.name, args: tc.args,
-            requiresConfirmation: meta.requiresConfirmation, riskLevel: meta.riskLevel,
-          }
-        })
-        send({ type: 'tool_call', batch_id, tool_calls: toolCallsWithMeta })
-        console.log(`[chat] session=${session_id} batch=${batch_id} tools=${toolCalls.map((t) => t.name).join(',')} (mock)`)
+      if (!pendingTask) break // 到达 END
 
-        // 阶段1：mock 执行，自动回假数据后 resume
-        const mockResults = toolCalls.map((tc) => mockExecute(tc))
-        input = new Command({ resume: mockResults })
-        continue
+      const interruptValue = pendingTask.interrupts![0].value as { toolCalls?: ToolCallReq[] }
+      const toolCalls: ToolCallReq[] = (interruptValue?.toolCalls || []).map((tc) => ({
+        id: tc.id, name: tc.name, args: tc.args,
+      }))
+      const batch_id = `b-${Date.now()}`
+      const toolCallsWithMeta = toolCalls.map((tc) => {
+        const meta = getToolMeta(tc.name)
+        return {
+          tool_call_id: tc.id, name: tc.name, args: tc.args,
+          requiresConfirmation: meta.requiresConfirmation, riskLevel: meta.riskLevel,
+        }
+      })
+      send({ type: 'tool_call', batch_id, tool_calls: toolCallsWithMeta })
+      console.log(`[chat] session=${sessionId} batch=${batch_id} tools=${toolCalls.map((t) => t.name).join(',')} -> waiting phone`)
+
+      // 等待手机回传；超时/断开返回 null
+      const results = await registry.register(sessionId, batch_id, TOOL_TIMEOUT_MS)
+      if (results === null) {
+        // 超时或客户端断开：用错误结果 resume，避免 graph 卡死在检查点
+        const errResults: ToolResultInput[] = toolCalls.map((tc) => ({
+          tool_call_id: tc.id, success: false,
+          data: clientClosed ? '客户端已断开' : '工具执行超时',
+        }))
+        console.log(`[chat] session=${sessionId} batch=${batch_id} ${clientClosed ? 'client closed' : 'timeout'} -> resume with error`)
+        input = new Command({ resume: errResults })
+      } else {
+        console.log(`[chat] session=${sessionId} batch=${batch_id} got ${results.length} results -> resume`)
+        input = new Command({ resume: results })
       }
-      break // 到达 END
+      if (clientClosed) {
+        // 客户端已断开：继续 resume 让 graph 收尾（写检查点），但不再发 SSE
+        console.log(`[chat] session=${sessionId} client closed, finishing graph silently`)
+      }
     }
     send({ type: 'final' })
   } catch (e: unknown) {
     console.error('[chat] error:', e)
     send({ type: 'error', message: String((e as Error)?.message || e) })
   } finally {
-    res.end()
+    finished = true
+    try { res.end() } catch {}
   }
 })
 
 app.post('/api/tool-result', (req: Request, res: Response) => {
   if (!checkAuth(req, res)) return
-  res.status(501).json({ error: 'not implemented yet (phase 2) — phase 1 uses mock executor' })
+  const { session_id, batch_id, results } = req.body || {}
+  if (!session_id || !batch_id || !Array.isArray(results)) {
+    res.status(400).json({ error: 'session_id, batch_id and results[] are required' })
+    return
+  }
+  const ok = registry.resolve(String(session_id), String(batch_id), results as ToolResultInput[])
+  if (!ok) {
+    res.status(409).json({ error: 'no pending tool call for this session/batch (expired or mismatched)' })
+    return
+  }
+  res.status(202).json({ ok: true })
 })
 
 app.listen(PORT, () => {
