@@ -38,6 +38,16 @@ export const toolMeta: Record<string, ToolMeta> = {
   set_remind_minutes: { requiresConfirmation: true, riskLevel: 'low' },
   refresh_reminders: { requiresConfirmation: true, riskLevel: 'low' },
   navigate_to_page: { requiresConfirmation: false, riskLevel: 'low' },
+  get_current_datetime: { requiresConfirmation: false, riskLevel: 'low' },
+  query_courses_by_date: { requiresConfirmation: false, riskLevel: 'low' },
+  query_tomorrow_courses: { requiresConfirmation: false, riskLevel: 'low' },
+  query_course_by_name: { requiresConfirmation: false, riskLevel: 'low' },
+  list_calendar_events: { requiresConfirmation: false, riskLevel: 'low' },
+  add_to_calendar: { requiresConfirmation: true, riskLevel: 'medium' },
+  add_exam_to_calendar: { requiresConfirmation: true, riskLevel: 'medium' },
+  add_course_to_calendar: { requiresConfirmation: true, riskLevel: 'medium' },
+  remove_calendar_event: { requiresConfirmation: true, riskLevel: 'medium' },
+  update_schedule: { requiresConfirmation: true, riskLevel: 'medium' },
 }
 
 export function getToolMeta(name: string): ToolMeta {
@@ -172,7 +182,85 @@ export const tools: StructuredTool[] = [
     name: 'navigate_to_page',
     description: '导航到应用内指定页面',
     schema: z.object({
-      page: z.string().describe('页面标识：course_table(课表)、exam(考试)、grade(成绩)、schedule(日程)、settings(设置)'),
+      page: z.string().describe('页面标识：course_table(课表)、exam(考试)、grade(成绩)、schedule(日程)、settings(设置)、course_import(导入课表)、exam_import(导入考试)、grade_import(导入成绩)、assistant(AI助手)、home(首页)'),
+    }),
+  }),
+  tool(deviceStub, {
+    name: 'get_current_datetime',
+    description: '获取当前日期、时间、星期几、第几教学周、当前学期等基础时间信息。涉及"今天/明天/本周/这学期"等相对时间时务必先调用此工具，避免凭空猜测日期。',
+    schema: z.object({}),
+  }),
+  tool(deviceStub, {
+    name: 'query_courses_by_date',
+    description: '查询指定日期的课程安排（自动换算教学周与星期）',
+    schema: z.object({ date: z.string().describe('日期，格式YYYY-MM-DD') }),
+  }),
+  tool(deviceStub, {
+    name: 'query_tomorrow_courses',
+    description: '查询明天的课程安排',
+    schema: z.object({}),
+  }),
+  tool(deviceStub, {
+    name: 'query_course_by_name',
+    description: '按课程名查询上课时间、教室、教师及生效周次（支持模糊匹配）',
+    schema: z.object({ courseName: z.string().describe('课程名称或关键词') }),
+  }),
+  tool(deviceStub, {
+    name: 'list_calendar_events',
+    description: '列出已写入系统日历的本应用事件，默认查询未来30天',
+    schema: z.object({
+      startDate: z.string().optional().describe('起始日期YYYY-MM-DD，默认今天'),
+      endDate: z.string().optional().describe('结束日期YYYY-MM-DD，默认今天+30天'),
+    }),
+  }),
+  tool(deviceStub, {
+    name: 'add_to_calendar',
+    description: '创建一条日程并写入系统日历，可设置提前若干分钟提醒。会在应用内日程与系统日历各建一份并互相关联。',
+    schema: z.object({
+      title: z.string().describe('日程标题'),
+      date: z.string().describe('日期，格式YYYY-MM-DD'),
+      startTime: z.string().describe('开始时间，格式HH:mm'),
+      endTime: z.string().describe('结束时间，格式HH:mm'),
+      remindMinutesBefore: z.number().optional().describe('提前提醒的分钟数，默认30'),
+      location: z.string().optional().describe('地点，可选'),
+      description: z.string().optional().describe('描述，可选'),
+      type: z.string().optional().describe('类型：custom(自定义)或assignment(作业)，默认custom'),
+    }),
+  }),
+  tool(deviceStub, {
+    name: 'add_exam_to_calendar',
+    description: '把一场考试写入系统日历并设置提前提醒。不传courseName则取最近一场即将到来的考试。',
+    schema: z.object({
+      courseName: z.string().optional().describe('课程名称或关键词，不传则取最近一场考试'),
+      remindMinutesBefore: z.number().optional().describe('提前提醒的分钟数，默认30'),
+    }),
+  }),
+  tool(deviceStub, {
+    name: 'add_course_to_calendar',
+    description: '把课程写入系统日历并设置提前提醒。可指定某门课与日期；不传courseName则添加当天全部课程。',
+    schema: z.object({
+      courseName: z.string().optional().describe('课程名称或关键词，不传则添加当天全部课程'),
+      date: z.string().optional().describe('日期YYYY-MM-DD，默认今天'),
+      remindMinutesBefore: z.number().optional().describe('提前提醒的分钟数，默认15'),
+    }),
+  }),
+  tool(deviceStub, {
+    name: 'remove_calendar_event',
+    description: '从系统日历移除指定事件（按系统日历事件ID）',
+    schema: z.object({ calendarEventId: z.number().describe('系统日历事件ID，可通过list_calendar_events获取') }),
+  }),
+  tool(deviceStub, {
+    name: 'update_schedule',
+    description: '编辑已有的应用内日程，修改其字段。若该日程已关联系统日历事件，会同步更新日历。',
+    schema: z.object({
+      eventId: z.string().describe('要编辑的日程ID'),
+      title: z.string().optional().describe('新标题'),
+      date: z.string().optional().describe('新日期YYYY-MM-DD'),
+      startTime: z.string().optional().describe('新开始时间HH:mm'),
+      endTime: z.string().optional().describe('新结束时间HH:mm'),
+      location: z.string().optional().describe('新地点'),
+      description: z.string().optional().describe('新描述'),
+      type: z.string().optional().describe('新类型：custom或assignment'),
     }),
   }),
 ]
