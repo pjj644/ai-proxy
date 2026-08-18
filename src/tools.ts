@@ -48,6 +48,9 @@ export const toolMeta: Record<string, ToolMeta> = {
   add_course_to_calendar: { requiresConfirmation: true, riskLevel: 'medium' },
   remove_calendar_event: { requiresConfirmation: true, riskLevel: 'medium' },
   update_schedule: { requiresConfirmation: true, riskLevel: 'medium' },
+  generate_study_plan: { requiresConfirmation: false, riskLevel: 'low' },
+  query_campus_guide: { requiresConfirmation: false, riskLevel: 'low' },
+  parse_text_to_schedule: { requiresConfirmation: false, riskLevel: 'low' },
 }
 
 export function getToolMeta(name: string): ToolMeta {
@@ -261,6 +264,29 @@ export const tools: StructuredTool[] = [
       location: z.string().optional().describe('新地点'),
       description: z.string().optional().describe('新描述'),
       type: z.string().optional().describe('新类型：custom或assignment'),
+    }),
+  }),
+  tool(deviceStub, {
+    name: 'generate_study_plan',
+    description: '分析用户所有即将到来的考试科目，结合剩余天数与难易度，自动生成合理的考前每日复习冲刺任务计划',
+    schema: z.object({
+      dailyHours: z.number().optional().describe('每日可用复习小时数，默认 4 小时'),
+      focusCourse: z.string().optional().describe('重点突击的课程名称，可选'),
+    }),
+  }),
+  tool(deviceStub, {
+    name: 'query_campus_guide',
+    description: '查询成电（电子科技大学）校园生活指南与校务政策，包括清水河/沙河校车时刻、重修免修、成绩保研规则、校医院与办事指南',
+    schema: z.object({
+      category: z.enum(['bus', 'academic_policy', 'hospital', 'facilities', 'all']).describe('查询分类：bus(校车), academic_policy(教务/保研/免修), hospital(就医), facilities(场馆/图书馆), all(全部)'),
+      keyword: z.string().optional().describe('具体查询关键词'),
+    }),
+  }),
+  tool(deviceStub, {
+    name: 'parse_text_to_schedule',
+    description: '从自然语言通知文本、讲座通知、作业通知中智能提取事件名称、日期、开始与结束时间、地点，并直接准备日程结构',
+    schema: z.object({
+      rawText: z.string().describe('用户提供的通知或活动原始文本内容'),
     }),
   }),
 ]

@@ -5,6 +5,8 @@ import { Command } from '@langchain/langgraph'
 import { graph, ToolResultInput } from './graph'
 import { getToolMeta } from './tools'
 import { registry } from './registry'
+import { parseScheduleFromImage } from './vision'
+import { campusKnowledge } from './knowledge/store'
 
 const app = express()
 app.use(express.json({ limit: '8mb' }))
@@ -153,8 +155,34 @@ app.post('/api/tool-result', (req: Request, res: Response) => {
   res.status(202).json({ ok: true })
 })
 
+app.post('/api/vision/parse-schedule', async (req: Request, res: Response) => {
+  if (!checkAuth(req, res)) return
+  const { image, hint } = req.body || {}
+  if (!image) {
+    res.status(400).json({ error: 'image base64 is required' })
+    return
+  }
+  try {
+    const result = await parseScheduleFromImage(String(image), hint ? String(hint) : undefined)
+    res.json({ ok: true, data: result })
+  } catch (error: unknown) {
+    console.error('[vision/parse-schedule] error:', error)
+    res.status(500).json({ ok: false, error: String((error as Error)?.message || error) })
+  }
+})
+
+app.get('/api/knowledge/search', (req: Request, res: Response) => {
+  if (!checkAuth(req, res)) return
+  const category = req.query.category ? String(req.query.category) : undefined
+  const keyword = req.query.keyword ? String(req.query.keyword) : undefined
+  const limit = req.query.limit ? parseInt(String(req.query.limit), 10) : 5
+  const results = campusKnowledge.search({ category, keyword, limit })
+  res.json({ ok: true, count: results.length, data: results })
+})
+
 app.listen(PORT, () => {
   console.log(`[ai-agent] listening on port ${PORT}`)
 })
 
 export { app }
+
