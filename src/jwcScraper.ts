@@ -4,8 +4,7 @@ export interface JwcNoticeItem {
   title: string
   date: string
   url: string
-  category?: string
-  summary?: string
+  category: string
 }
 
 export interface JwcSearchResult {
@@ -18,22 +17,12 @@ export interface JwcSearchResult {
 
 const JWC_BASE_URL = 'https://www.jwc.uestc.edu.cn'
 
-const CATEGORY_MAP: Record<string, string> = {
-  all: `${JWC_BASE_URL}/tzgg/qb.htm`,
-  jxtz: `${JWC_BASE_URL}/tzgg/jxtz.htm`,
-  kwtz: `${JWC_BASE_URL}/tzgg/kwtz.htm`,
-  sjjx: `${JWC_BASE_URL}/tzgg/sjjx.htm`,
-  xjgl: `${JWC_BASE_URL}/tzgg/xjgl.htm`,
-}
-
-export async function searchJwcWebsite(keyword?: string, category: string = 'all', limit: number = 6): Promise<JwcSearchResult> {
-  const targetUrl = CATEGORY_MAP[category] || CATEGORY_MAP.all
-
+export async function searchJwcWebsite(keyword?: string, category: string = 'all', limit: number = 8): Promise<JwcSearchResult> {
   try {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 8000)
 
-    const response = await fetch(targetUrl, {
+    const response = await fetch(JWC_BASE_URL, {
       signal: controller.signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -50,79 +39,109 @@ export async function searchJwcWebsite(keyword?: string, category: string = 'all
 
     const html = await response.text()
     const $ = cheerio.load(html)
-    const items: JwcNoticeItem[] = []
+    const allNotices: JwcNoticeItem[] = []
+    const seenTitles = new Set<string>()
 
-    // 成电教务处常见列表选择器（兼容列表页 li / tr / .list-item 结构）
-    $('ul.list-gl li, .list-box li, .news_list li, .tzgg-list li, ul.list li').each((_, elem) => {
-      const aTag = $(elem).find('a')
-      let title = aTag.attr('title') || aTag.text()
+    // 遍历所有可能的通知 a 标签
+    $('a').each((_, elem) => {
+      let title = $(elem).attr('title') || $(elem).text()
       title = title.replace(/\s+/g, ' ').trim()
 
-      const rawHref = aTag.attr('href') || ''
-      if (!title || !rawHref) return
-
-      // 解析完整 URL
-      let fullUrl = rawHref
-      if (!rawHref.startsWith('http')) {
-        if (rawHref.startsWith('../')) {
-          fullUrl = `${JWC_BASE_URL}/${rawHref.replace(/^(\.\.\/)+/, '')}`
-        } else if (rawHref.startsWith('/')) {
-          fullUrl = `${JWC_BASE_URL}${rawHref}`
-        } else {
-          fullUrl = `${JWC_BASE_URL}/tzgg/${rawHref}`
-        }
+      // 过滤非通知类的超链接
+      if (!title || title.length < 4 || title === 'javascript:;' || title === '更多' || title.includes('更多>>')) {
+        return
       }
 
-      // 提取日期（通常在 span 或 em 中，如 2026-08-18 或 08-18）
-      const dateText = $(elem).find('.date, .time, span, em').last().text().trim()
-      const dateMatch = dateText.match(/\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}/)
-      const date = dateMatch ? dateMatch[0] : (dateText || '近期')
+      // 判断是否含有成电教务处典型的分类前缀或通知关键词
+      const isNotice = title.startsWith('【') || 
+                       title.includes('通知') || 
+                       title.includes('公告') || 
+                       title.includes('安排') || 
+                       title.includes('公示') || 
+                       title.includes('名单') ||
+                       title.includes('选课') ||
+                       title.includes('考试') ||
+                       title.includes('申报')
 
-      // 过滤关键词
-      if (keyword && keyword.trim().length > 0) {
-        const q = keyword.trim().toLowerCase()
-        if (!title.toLowerCase().includes(q)) {
-          return
-        }
+      if (!isNotice || seenTitles.has(title)) {
+        return
       }
 
-      items.push({
+      // 提取分类
+      let itemCategory = '教务通知'
+      const catMatch = title.match(/【(.*?)】/)
+      if (catMatch) {
+        itemCategory = catMatch[1]
+      }
+
+      // 提取日期：查找兄弟节点或父级内部的 <i>、<span>、.date、.time
+      let date = ''
+      const parent = $(elem).parent()
+      const dateElem = parent.find('i, span, .date, .time, em')
+      dateElem.each((_, d) => {
+        const t = $(d).text().trim()
+        if (/^\d{1,2}-\d{1,2}$|^\d{4}-\d{1,2}-\d{1,2}$/.test(t)) {
+          date = t
+        }
+      })
+
+      if (!date) {
+        date = '近期'
+      }
+
+      // 提取详情链接
+      let href = $(elem).attr('href') || ''
+      let fullUrl = JWC_BASE_URL
+      if (href && href !== '#' && !href.startsWith('javascript:')) {
+        fullUrl = href.startsWith('http') ? href : `${JWC_BASE_URL}/${href.replace(/^\//, '')}`
+      }
+
+      seenTitles.add(title)
+      allNotices.push({
         title,
         date,
         url: fullUrl,
-        category: category !== 'all' ? category : '教务通知',
+        category: itemCategory,
       })
     })
 
-    // 如果指定关键词没有严格匹配到，做分词后宽泛匹配
-    if (keyword && keyword.trim().length > 0 && items.length === 0) {
-      const tokens = keyword.trim().split(/\s+/).filter(t => t.length > 0)
-      $('ul.list-gl li, .list-box li, .news_list li, .tzgg-list li, ul.list li').each((_, elem) => {
-        const aTag = $(elem).find('a')
-        let title = (aTag.attr('title') || aTag.text()).replace(/\s+/g, ' ').trim()
-        const rawHref = aTag.attr('href') || ''
-        if (!title || !rawHref) return
+    // 根据关键词和分类进行匹配与过滤
+    let filtered = allNotices
 
-        if (tokens.some(token => title.includes(token))) {
-          let fullUrl = rawHref
-          if (!rawHref.startsWith('http')) {
-            fullUrl = rawHref.startsWith('/') ? `${JWC_BASE_URL}${rawHref}` : `${JWC_BASE_URL}/tzgg/${rawHref}`
-          }
-          const dateText = $(elem).find('.date, .time, span, em').last().text().trim()
-          items.push({
-            title,
-            date: dateText || '近期',
-            url: fullUrl,
-            category: '教务通知',
-          })
+    if (category && category !== 'all') {
+      filtered = filtered.filter(n => n.category.includes(category) || category.includes(n.category))
+    }
+
+    if (keyword && keyword.trim().length > 0) {
+      const q = keyword.trim().toLowerCase()
+      const tokens = q.split(/[\s,，、+&|/._\-!！?？]+/).filter(t => t.length > 0)
+
+      const scored = filtered.map(item => {
+        let score = 0
+        const tLower = item.title.toLowerCase()
+        if (tLower.includes(q)) score += 30
+        for (const tok of tokens) {
+          if (tLower.includes(tok)) score += 10
         }
+        if (item.category.toLowerCase().includes(q)) score += 5
+        return { item, score }
       })
+
+      filtered = scored
+        .filter(s => s.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map(s => s.item)
+
+      // 如果完全没匹配到，退回到全部最新通知
+      if (filtered.length === 0) {
+        filtered = allNotices.slice(0, limit)
+      }
     }
 
     return {
       success: true,
-      total: items.length,
-      notices: items.slice(0, limit),
+      total: filtered.length,
+      notices: filtered.slice(0, limit),
       query: keyword || '全部最新通知',
     }
   } catch (err: unknown) {
