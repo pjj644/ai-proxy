@@ -55,14 +55,59 @@ export class CampusKnowledgeStore {
     }
 
     if (keyword && keyword.trim().length > 0) {
-      const q = keyword.trim().toLowerCase()
+      const fullQuery = keyword.trim().toLowerCase()
+      // 1. 基础分词（按空白、标点）
+      const baseTokens = fullQuery
+        .split(/[\s,，、+&|/._\-!！?？]+/)
+        .filter((t) => t.length > 0)
+
+      // 2. 中文 N-Gram 切分（生成 2-gram 和 3-gram 词元以支持中文自然语言无空格提问）
+      const ngrams: string[] = []
+      for (const t of baseTokens) {
+        if (t.length >= 2) {
+          for (let i = 0; i < t.length - 1; i++) {
+            ngrams.push(t.substring(i, i + 2))
+            if (i < t.length - 2) {
+              ngrams.push(t.substring(i, i + 3))
+            }
+          }
+        }
+      }
+
+      const allTokens = Array.from(new Set([...baseTokens, ...ngrams]))
+
       const scored = filtered.map((item) => {
         let score = 0
-        if (item.title.toLowerCase().includes(q)) score += 10
-        if (item.tags.some((t) => t.toLowerCase().includes(q))) score += 8
-        if (item.summary.toLowerCase().includes(q)) score += 5
-        if (item.content.toLowerCase().includes(q)) score += 3
-        if (item.details && item.details.toLowerCase().includes(q)) score += 2
+        const titleLower = item.title.toLowerCase()
+        const summaryLower = item.summary.toLowerCase()
+        const contentLower = item.content.toLowerCase()
+        const detailsLower = (item.details || '').toLowerCase()
+        const tagsLower = item.tags.map((t) => t.toLowerCase())
+
+        // 1. 完整查询命中（最高优先级）
+        if (titleLower.includes(fullQuery)) score += 50
+        if (tagsLower.some((t) => t.includes(fullQuery) || fullQuery.includes(t))) score += 40
+        if (summaryLower.includes(fullQuery)) score += 20
+        if (contentLower.includes(fullQuery)) score += 10
+        if (detailsLower.includes(fullQuery)) score += 5
+
+        // 2. Base Token 命中
+        for (const token of baseTokens) {
+          if (titleLower.includes(token)) score += 15
+          if (tagsLower.some((t) => t.includes(token) || token.includes(t))) score += 12
+          if (summaryLower.includes(token)) score += 8
+          if (contentLower.includes(token)) score += 4
+          if (detailsLower.includes(token)) score += 2
+        }
+
+        // 3. N-Gram 语义片段加权
+        for (const gram of ngrams) {
+          if (titleLower.includes(gram)) score += 4
+          if (tagsLower.some((t) => t.includes(gram))) score += 3
+          if (summaryLower.includes(gram)) score += 2
+          if (contentLower.includes(gram)) score += 1
+        }
+
         return { item, score }
       })
 

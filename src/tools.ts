@@ -51,6 +51,7 @@ export const toolMeta: Record<string, ToolMeta> = {
   generate_study_plan: { requiresConfirmation: false, riskLevel: 'low' },
   query_campus_guide: { requiresConfirmation: false, riskLevel: 'low' },
   parse_text_to_schedule: { requiresConfirmation: false, riskLevel: 'low' },
+  search_jwc_news: { requiresConfirmation: false, riskLevel: 'low' },
 }
 
 export function getToolMeta(name: string): ToolMeta {
@@ -289,4 +290,13 @@ export const tools: StructuredTool[] = [
       rawText: z.string().describe('用户提供的通知或活动原始文本内容'),
     }),
   }),
+  tool(deviceStub, {
+    name: 'search_jwc_news',
+    description: '从电子科技大学教务处官网(www.jwc.uestc.edu.cn)实时检索最新教务通知、考试公告、选拔公示与新闻。优先使用本地query_campus_guide；仅当本地知识库无相关信息，且问题明确属于教务处最新动态/公告时使用。',
+    schema: z.object({
+      keyword: z.string().describe('检索关键词，如"四六级"、"转专业"、"补考"、"选课"'),
+      category: z.enum(['all', 'jxtz', 'kwtz', 'sjjx', 'xjgl']).optional().describe('分类：all(全部)、jxtz(教学通知)、kwtz(考务通知)、sjjx(实践教学)、xjgl(学籍管理)'),
+    }),
+  }),
 ]
+

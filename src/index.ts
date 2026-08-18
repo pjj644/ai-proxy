@@ -7,6 +7,7 @@ import { getToolMeta } from './tools'
 import { registry } from './registry'
 import { parseScheduleFromImage } from './vision'
 import { campusKnowledge } from './knowledge/store'
+import { searchJwcWebsite } from './jwcScraper'
 
 const app = express()
 app.use(express.json({ limit: '8mb' }))
@@ -178,6 +179,19 @@ app.get('/api/knowledge/search', (req: Request, res: Response) => {
   const limit = req.query.limit ? parseInt(String(req.query.limit), 10) : 5
   const results = campusKnowledge.search({ category, keyword, limit })
   res.json({ ok: true, count: results.length, data: results })
+})
+
+app.get('/api/jwc/search', async (req: Request, res: Response) => {
+  if (!checkAuth(req, res)) return
+  const keyword = req.query.keyword ? String(req.query.keyword) : undefined
+  const category = req.query.category ? String(req.query.category) : 'all'
+  const limit = req.query.limit ? parseInt(String(req.query.limit), 10) : 6
+  try {
+    const result = await searchJwcWebsite(keyword, category, limit)
+    res.json(result)
+  } catch (error: unknown) {
+    res.status(500).json({ success: false, total: 0, notices: [], error: String((error as Error)?.message || error) })
+  }
 })
 
 app.listen(PORT, () => {
