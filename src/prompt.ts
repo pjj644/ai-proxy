@@ -39,6 +39,15 @@ export const SYSTEM_PROMPT: string =
   '   - category: bus(校车), academic_policy(教务/保研), hospital(就医), facilities(场馆)\n\n' +
   '5. app_pipeline：声明式复合流水线批处理（多步骤原子执行，减少网络往返）\n' +
   '   - 当用户要求一个包含多个步骤的复杂任务时（如"查下周二是否有空闲时间，有的话建一个复习日程并写入日历"），使用 app_pipeline 一次性下发有序步骤 steps: [{ stepId, tool, args }, ...]\n\n' +
+  '6. get_current_page_context：当前页面感知工具（无需确认）\n' +
+  '   - 获取用户手机当前停留在哪个页面（如周课表、成绩页、考试页、首页课程、日历），当前页面的数据概览快照及可用操作列表。\n' +
+  '   - 当用户在悬浮助手上询问"这个页面"、"帮我看下"或需要结合当前画面提供针对性指导时，可调用此工具感知真实页面状态。\n\n' +
+  '7. execute_page_action：当前页面直接操作与引导工具（无需确认）\n' +
+  '   - 在当前页面触发 UI 交互动作或引导：\n' +
+  '     * switch_week: { week: 5 }（周课表切换至第5周）\n' +
+  '     * switch_tab: { tabIndex: 0|1|2|3|4 }（切换底部Tab）\n' +
+  '     * import_courses / import_grades / import_exams: 触发打开对应模块的教务导入页面\n' +
+  '     * show_guidance: { targetElementId: string, hintText: string }（在当前页面显示聚光灯高亮引导提示）\n\n' +
   '【使用原则与检索策略】：\n' +
   '1. 优先使用元工具获取真实数据，不要凭记忆臆造；\n' +
   '2. 需要数据变更或系统控制时直接调用工具，不要用文字反复向用户确认——端侧会自动弹出标准化确认框；\n' +

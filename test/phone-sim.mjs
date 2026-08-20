@@ -73,6 +73,20 @@ function mockData(name, args) {
         message: '流水线所有步骤已在端侧顺利执行完毕',
         stepResults: (args?.steps || []).map((s) => ({ stepId: s.stepId, success: true, result: 'OK' })),
       })
+    case 'get_current_page_context':
+      return JSON.stringify({
+        pageName: 'grade',
+        pageTitle: '成绩查询',
+        summaryText: '当前学期GPA: 3.82，总学分: 35，已出成绩科目: 15门',
+        dataSnapshot: { gpa: '3.82', totalCredits: 35, courseCount: 15 },
+        availableActions: [{ actionId: 'import_grades', label: '从教务系统导入成绩', description: '打开教务成绩导入页面' }],
+      })
+    case 'execute_page_action':
+      return JSON.stringify({
+        action: args?.action,
+        dispatched: true,
+        message: `页面动作 [${args?.action}] 执行成功`,
+      })
     // 兼容原有 mock
     case 'query_today_courses':
       return JSON.stringify({
