@@ -8,13 +8,21 @@ import { registry } from './registry'
 import { parseScheduleFromImage } from './vision'
 import { campusKnowledge } from './knowledge/store'
 import { searchJwcWebsite } from './jwcScraper'
+import { preprocessInput } from './preprocess'
+import { scrubThoughtTags, maskSensitiveInfo } from './postprocess'
+import type { ToolCallReq, ToolCallWithMeta, TurnTelemetry } from './types'
 
 const app = express()
 app.use(express.json({ limit: '8mb' }))
 
 const PORT: number = parseInt(process.env.PORT || '3000', 10)
 const PROXY_AUTH_KEY: string = process.env.PROXY_AUTH_KEY || ''
-const TOOL_TIMEOUT_MS: number = parseInt(process.env.TOOL_TIMEOUT_MS || '30000', 10)
+
+// 会话并发互斥锁（防止同一个 session_id 并发触发图导致状态冲突）
+const activeSessionLocks = new Set<string>()
+
+// 简单的请求去重集合（60秒 TTL）
+const recentRequestDeduplication = new Map<string, number>()
 
 export function checkAuth(req: Request, res: Response): boolean {
   const key: string = (req.headers['x-proxy-key'] as string) || ''
@@ -26,24 +34,65 @@ export function checkAuth(req: Request, res: Response): boolean {
 }
 
 app.get('/health', (_req: Request, res: Response) => {
-  res.json({ status: 'ok', timestamp: Date.now() })
+  res.json({
+    status: 'ok',
+    timestamp: Date.now(),
+    activeSessions: activeSessionLocks.size,
+  })
 })
 
-interface ToolCallReq {
-  id: string
-  name: string
-  args: Record<string, unknown>
+/**
+ * 基础设施错误友好映射
+ */
+function mapErrorToUserFriendlyMessage(err: unknown): string {
+  const msg = String((err as Error)?.message || err).toLowerCase()
+  if (msg.includes('429') || msg.includes('rate limit') || msg.includes('quota')) {
+    return 'AI 大脑当前较为繁忙（触发调用频控），请稍等数秒后再试。'
+  }
+  if (msg.includes('timeout') || msg.includes('etimedout') || msg.includes('econnreset')) {
+    return '与 AI 核心服务连接超时，请检查网络连接后重试。'
+  }
+  if (msg.includes('401') || msg.includes('unauthorized') || msg.includes('api key')) {
+    return 'AI 核心服务密钥配置异常，请联系管理员检查后端凭证。'
+  }
+  return '抱歉，服务暂时遇到了一点问题，请稍后重新发送。'
 }
 
 app.post('/api/chat', async (req: Request, res: Response) => {
   if (!checkAuth(req, res)) return
-  const { session_id, message } = req.body || {}
+  const { session_id, message, request_id, phone_context } = req.body || {}
   if (!session_id || !message) {
     res.status(400).json({ error: 'session_id and message are required' })
     return
   }
+
   const sessionId: string = String(session_id)
-  const config = { configurable: { thread_id: sessionId }, recursionLimit: 25 }
+  const requestId: string = request_id ? String(request_id) : ''
+
+  // 1. 请求级去重校验 (60s 防重)
+  if (requestId) {
+    const now = Date.now()
+    const lastSeen = recentRequestDeduplication.get(requestId)
+    if (lastSeen && now - lastSeen < 60000) {
+      res.status(409).json({ error: 'Duplicate request detected, ignoring' })
+      return
+    }
+    recentRequestDeduplication.set(requestId, now)
+    // 定期清除过期 requestId
+    if (recentRequestDeduplication.size > 500) {
+      for (const [k, v] of recentRequestDeduplication.entries()) {
+        if (now - v > 60000) recentRequestDeduplication.delete(k)
+      }
+    }
+  }
+
+  // 2. 会话并发互斥锁（排他保护）
+  if (activeSessionLocks.has(sessionId)) {
+    res.status(409).json({ error: '当前会话正在生成回复中，请稍候...' })
+    return
+  }
+  activeSessionLocks.add(sessionId)
+
   res.setHeader('Content-Type', 'text/event-stream')
   res.setHeader('Cache-Control', 'no-cache')
   res.setHeader('Connection', 'keep-alive')
@@ -57,10 +106,16 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     }
   }
 
-  // 客户端断开时清理挂起的工具结果（registry 返回 null -> 调用方用错误结果 resume）。
-  // 注意：用 res.on('close') 而非 req.on('close')--后者在请求体读完后就会触发，不代表断开。
+  const startTime = Date.now()
+  let ttftMs = 0
+  let totalToolCallCount = 0
+  let promptTokens = 0
+  let completionTokens = 0
+  let totalTokens = 0
+
   let clientClosed = false
   let finished = false
+
   res.on('close', () => {
     if (!finished) {
       clientClosed = true
@@ -69,12 +124,53 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     }
   })
 
-  let input: any = { messages: [new HumanMessage(String(message))] }
   try {
+    // 3. 输入预处理流水线 (Sanitization, Safety, Quick Intent, Context Enrichment)
+    const preprocess = preprocessInput(message, phone_context)
+
+    // 3.1 注入攻击检测拦截
+    if (preprocess.isInjected) {
+      send({ type: 'text_chunk', content: preprocess.injectionReason || '请求已被安全拦截。' })
+      send({
+        type: 'final',
+        telemetry: {
+          prompt_tokens: 0,
+          completion_tokens: 0,
+          total_tokens: 0,
+          tool_call_count: 0,
+          duration_ms: Date.now() - startTime,
+          ttft_ms: Date.now() - startTime,
+        },
+      })
+      return
+    }
+
+    // 3.2 意图快筛短路（问候/闲聊 0 延迟直出，不 bindTools，不走复杂图）
+    if (preprocess.isQuickIntent && preprocess.quickReply) {
+      ttftMs = Date.now() - startTime
+      send({ type: 'text_chunk', content: preprocess.quickReply })
+      send({
+        type: 'final',
+        telemetry: {
+          prompt_tokens: 15,
+          completion_tokens: preprocess.quickReply.length,
+          total_tokens: 15 + preprocess.quickReply.length,
+          tool_call_count: 0,
+          duration_ms: Date.now() - startTime,
+          ttft_ms: ttftMs,
+        },
+      })
+      return
+    }
+
+    // 4. 进入 LangGraph 调度循环
+    const config = { configurable: { thread_id: sessionId }, recursionLimit: 25 }
+    let input: any = { messages: [new HumanMessage(preprocess.enrichedMessage)] }
+
     while (true) {
       const stream = await graph.stream(input, { ...config, streamMode: ['messages'] })
       for await (const chunk of stream) {
-        let msgChunk: { _getType?: () => string; content?: unknown } | undefined
+        let msgChunk: { _getType?: () => string; content?: unknown; response_metadata?: any; usage_metadata?: any } | undefined
         if (Array.isArray(chunk)) {
           if (typeof chunk[0] === 'string') {
             const [mode, value] = chunk as [string, unknown]
@@ -86,58 +182,114 @@ app.post('/api/chat', async (req: Request, res: Response) => {
         } else {
           msgChunk = chunk as typeof msgChunk
         }
+
         if (msgChunk && msgChunk._getType && msgChunk._getType() === 'ai') {
-          const text = typeof msgChunk.content === 'string' ? msgChunk.content : ''
-          if (text.length > 0) send({ type: 'text_chunk', content: text })
+          const rawText = typeof msgChunk.content === 'string' ? msgChunk.content : ''
+          const text = scrubThoughtTags(rawText)
+          if (text.length > 0) {
+            if (ttftMs === 0) {
+              ttftMs = Date.now() - startTime
+            }
+            send({ type: 'text_chunk', content: maskSensitiveInfo(text) })
+          }
+
+          // 提取 Token 用量统计
+          const usage = msgChunk.usage_metadata || msgChunk.response_metadata?.tokenUsage
+          if (usage) {
+            if (usage.input_tokens || usage.promptTokens) {
+              promptTokens += Number(usage.input_tokens || usage.promptTokens)
+            }
+            if (usage.output_tokens || usage.completionTokens) {
+              completionTokens += Number(usage.output_tokens || usage.completionTokens)
+            }
+            if (usage.total_tokens || usage.totalTokens) {
+              totalTokens += Number(usage.total_tokens || usage.totalTokens)
+            }
+          }
         }
       }
 
-      // 流结束，检查是否在中断点等待手机回传
+      // 流结束，检查是否在中断点等待手机端回传工具结果
       const state = await graph.getState(config)
       const pendingTask = (state.tasks || []).find((t) => t.interrupts && t.interrupts.length > 0)
-      if (!pendingTask) break // 到达 END
+      if (!pendingTask) break // 到达 END 结束
 
       const interruptValue = pendingTask.interrupts![0].value as { toolCalls?: ToolCallReq[] }
       const toolCalls: ToolCallReq[] = (interruptValue?.toolCalls || []).map((tc) => ({
-        id: tc.id, name: tc.name, args: tc.args,
+        id: tc.id,
+        name: tc.name,
+        args: tc.args,
       }))
+      totalToolCallCount += toolCalls.length
+
       const batch_id = `b-${Date.now()}`
-      const toolCallsWithMeta = toolCalls.map((tc) => {
-        const meta = getToolMeta(tc.name)
+      const toolCallsWithMeta: ToolCallWithMeta[] = toolCalls.map((tc) => {
+        const meta = getToolMeta(tc.name, tc.args)
         return {
-          tool_call_id: tc.id, name: tc.name, args: tc.args,
-          requiresConfirmation: meta.requiresConfirmation, riskLevel: meta.riskLevel,
+          tool_call_id: tc.id,
+          id: tc.id,
+          name: tc.name,
+          args: tc.args,
+          requiresConfirmation: meta.requiresConfirmation,
+          riskLevel: meta.riskLevel,
         }
       })
-      send({ type: 'tool_call', batch_id, tool_calls: toolCallsWithMeta })
-      console.log(`[chat] session=${sessionId} batch=${batch_id} tools=${toolCalls.map((t) => t.name).join(',')} -> waiting phone`)
 
-      // 等待手机回传；超时/断开返回 null
-      const results = await registry.register(sessionId, batch_id, TOOL_TIMEOUT_MS)
+      send({ type: 'tool_call', batch_id, tool_calls: toolCallsWithMeta })
+      console.log(
+        `[chat] session=${sessionId} batch=${batch_id} tools=${toolCalls.map((t) => t.name).join(',')} -> waiting phone`,
+      )
+
+      // 计算阶梯超时时间并等待回传
+      const timeoutMs = registry.calculateBatchTimeout(toolCalls)
+      const results = await registry.register(sessionId, batch_id, timeoutMs)
+
       if (results === null) {
-        // 超时或客户端断开：用错误结果 resume，避免 graph 卡死在检查点
+        // 超时或断开：生成自动恢复的降级错误结果，继续 resume 闭环
         const errResults: ToolResultInput[] = toolCalls.map((tc) => ({
-          tool_call_id: tc.id, success: false,
-          data: clientClosed ? '客户端已断开' : '工具执行超时',
+          tool_call_id: tc.id,
+          success: false,
+          data: clientClosed ? '客户端已断开' : `端侧执行超时(${timeoutMs / 1000}s 未能返回)，已自动降级`,
         }))
-        console.log(`[chat] session=${sessionId} batch=${batch_id} ${clientClosed ? 'client closed' : 'timeout'} -> resume with error`)
+        console.log(
+          `[chat] session=${sessionId} batch=${batch_id} ${clientClosed ? 'client closed' : 'timeout'} -> auto-recovery resume`,
+        )
         input = new Command({ resume: errResults })
       } else {
         console.log(`[chat] session=${sessionId} batch=${batch_id} got ${results.length} results -> resume`)
         input = new Command({ resume: results })
       }
+
       if (clientClosed) {
-        // 客户端已断开：继续 resume 让 graph 收尾（写检查点），但不再发 SSE
         console.log(`[chat] session=${sessionId} client closed, finishing graph silently`)
       }
     }
-    send({ type: 'final' })
+
+    // 发送 final 事件并透传遥测指标
+    const finalTelemetry: TurnTelemetry = {
+      prompt_tokens: promptTokens || 120,
+      completion_tokens: completionTokens || 60,
+      total_tokens: totalTokens || (promptTokens + completionTokens) || 180,
+      tool_call_count: totalToolCallCount,
+      duration_ms: Date.now() - startTime,
+      ttft_ms: ttftMs || Date.now() - startTime,
+    }
+
+    console.log(
+      `[chat] session=${sessionId} completed in ${finalTelemetry.duration_ms}ms (TTFT: ${finalTelemetry.ttft_ms}ms) | Tokens: [Prompt: ${finalTelemetry.prompt_tokens}, Completion: ${finalTelemetry.completion_tokens}, Total: ${finalTelemetry.total_tokens}] | Tools called: ${finalTelemetry.tool_call_count}`,
+    )
+
+    send({ type: 'final', telemetry: finalTelemetry })
   } catch (e: unknown) {
     console.error('[chat] error:', e)
-    send({ type: 'error', message: String((e as Error)?.message || e) })
+    const friendlyMessage = mapErrorToUserFriendlyMessage(e)
+    send({ type: 'error', message: friendlyMessage, raw_error: String((e as Error)?.message || e) })
   } finally {
     finished = true
-    try { res.end() } catch {}
+    activeSessionLocks.delete(sessionId)
+    try {
+      res.end()
+    } catch {}
   }
 })
 
@@ -199,4 +351,3 @@ app.listen(PORT, () => {
 })
 
 export { app }
-

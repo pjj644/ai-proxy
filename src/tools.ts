@@ -25,6 +25,7 @@ export const toolMeta: Record<string, ToolMeta> = {
   app_pipeline: { requiresConfirmation: true, riskLevel: 'medium' },
 
   // 高阶辅助工具
+  ask_user_clarification: { requiresConfirmation: false, riskLevel: 'low' },
   generate_study_plan: { requiresConfirmation: false, riskLevel: 'low' },
   parse_text_to_schedule: { requiresConfirmation: false, riskLevel: 'low' },
   get_current_page_context: { requiresConfirmation: false, riskLevel: 'low' },
@@ -203,6 +204,19 @@ export const tools: StructuredTool[] = [
   }),
 
   // 6. 高阶智能辅助工具
+  tool(deviceStub, {
+    name: 'ask_user_clarification',
+    description:
+      '【信息补充与主动反问工具】当用户指令意图模糊、缺少关键必要信息（如具体时间/地点/科目/日程类型）或存在多个选项冲突时调用，向端侧下发反问问题及结构化可选卡片。',
+    schema: z.object({
+      question: z.string().describe('向用户清晰反问的具体问题或提示'),
+      options: z
+        .array(z.string())
+        .optional()
+        .describe('给用户提供的快捷选择候选项列表（例如 ["14:00 - 16:00 (图书馆)", "16:30 - 18:30 (品学楼)"]）'),
+      allowFreeInput: z.boolean().optional().describe('是否允许用户自由文本输入补充，默认 true'),
+    }),
+  }),
   tool(deviceStub, {
     name: 'generate_study_plan',
     description: '分析用户所有即将到来的考试科目，结合剩余天数与难易度，自动生成合理的考前每日复习冲刺任务计划',
