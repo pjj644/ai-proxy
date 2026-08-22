@@ -12,6 +12,8 @@ import { preprocessInput } from './preprocess'
 import { scrubThoughtTags, maskSensitiveInfo } from './postprocess'
 import type { ToolCallReq, ToolCallWithMeta, TurnTelemetry } from './types'
 
+import { verifyRequestSecurity, rateLimiter, validatePayloadBoundaries } from './security'
+
 const app = express()
 app.use(express.json({ limit: '8mb' }))
 
@@ -58,8 +60,7 @@ function mapErrorToUserFriendlyMessage(err: unknown): string {
   return '抱歉，服务暂时遇到了一点问题，请稍后重新发送。'
 }
 
-app.post('/api/chat', async (req: Request, res: Response) => {
-  if (!checkAuth(req, res)) return
+app.post('/api/chat', rateLimiter(30), verifyRequestSecurity, validatePayloadBoundaries, async (req: Request, res: Response) => {
   const { session_id, message, request_id, phone_context } = req.body || {}
   if (!session_id || !message) {
     res.status(400).json({ error: 'session_id and message are required' })
@@ -293,8 +294,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
   }
 })
 
-app.post('/api/tool-result', (req: Request, res: Response) => {
-  if (!checkAuth(req, res)) return
+app.post('/api/tool-result', rateLimiter(60), verifyRequestSecurity, (req: Request, res: Response) => {
   const { session_id, batch_id, results } = req.body || {}
   if (!session_id || !batch_id || !Array.isArray(results)) {
     res.status(400).json({ error: 'session_id, batch_id and results[] are required' })
@@ -308,8 +308,7 @@ app.post('/api/tool-result', (req: Request, res: Response) => {
   res.status(202).json({ ok: true })
 })
 
-app.post('/api/vision/parse-schedule', async (req: Request, res: Response) => {
-  if (!checkAuth(req, res)) return
+app.post('/api/vision/parse-schedule', rateLimiter(10), verifyRequestSecurity, async (req: Request, res: Response) => {
   const { image, hint } = req.body || {}
   if (!image) {
     res.status(400).json({ error: 'image base64 is required' })
@@ -324,8 +323,7 @@ app.post('/api/vision/parse-schedule', async (req: Request, res: Response) => {
   }
 })
 
-app.get('/api/knowledge/search', (req: Request, res: Response) => {
-  if (!checkAuth(req, res)) return
+app.get('/api/knowledge/search', rateLimiter(60), verifyRequestSecurity, (req: Request, res: Response) => {
   const category = req.query.category ? String(req.query.category) : undefined
   const keyword = req.query.keyword ? String(req.query.keyword) : undefined
   const limit = req.query.limit ? parseInt(String(req.query.limit), 10) : 5
@@ -333,8 +331,7 @@ app.get('/api/knowledge/search', (req: Request, res: Response) => {
   res.json({ ok: true, count: results.length, data: results })
 })
 
-app.get('/api/jwc/search', async (req: Request, res: Response) => {
-  if (!checkAuth(req, res)) return
+app.get('/api/jwc/search', rateLimiter(30), verifyRequestSecurity, async (req: Request, res: Response) => {
   const keyword = req.query.keyword ? String(req.query.keyword) : undefined
   const category = req.query.category ? String(req.query.category) : 'all'
   const limit = req.query.limit ? parseInt(String(req.query.limit), 10) : 6
