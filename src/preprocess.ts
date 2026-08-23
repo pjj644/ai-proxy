@@ -1,4 +1,5 @@
 import type { PreprocessResult } from './types'
+import { campusKnowledge } from './knowledge/store'
 
 const MAX_INPUT_LENGTH = 2000
 
@@ -104,6 +105,41 @@ export function preprocessInput(
     if (page) {
       contextPrefix += ` [端侧上下文: ${page} ${extra}]`
     }
+  }
+
+  // 6. 校园服务与系统知识 RAG 增强 (Service Knowledge Enrichment)
+  try {
+    const serviceMatches = campusKnowledge.search({ keyword: cleaned, limit: 2 })
+    if (serviceMatches && serviceMatches.length > 0) {
+      const q = cleaned.toLowerCase()
+      const relevant = serviceMatches.filter((item) => {
+        const titleLower = item.title.toLowerCase()
+        const tags = item.tags || []
+        const isMentionedInQuery = titleLower.split('').some((c) => q.includes(c)) ||
+          tags.some((t) => q.includes(t.toLowerCase())) ||
+          q.includes('邮箱') || q.includes('门户') || q.includes('网站') || q.includes('链接') ||
+          q.includes('网址') || q.includes('入口') || q.includes('怎么') || q.includes('哪里')
+        return isMentionedInQuery
+      })
+
+      if (relevant.length > 0) {
+        const hints = relevant
+          .map((item) => {
+            let h = `《${item.title}》`
+            if (item.url) {
+              h += `官方链接为 [${item.title}](${item.url})`
+            }
+            if (item.summary) {
+              h += ` (${item.summary})`
+            }
+            return h
+          })
+          .join('；')
+        contextPrefix += ` [校园知识库参考: ${hints}]`
+      }
+    }
+  } catch (e) {
+    console.error('[preprocess] RAG search error:', e)
   }
 
   const enriched = `${contextPrefix}\n${cleaned}`

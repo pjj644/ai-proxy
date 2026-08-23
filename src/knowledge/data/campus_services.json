@@ -1,5 +1,26 @@
 [
   {
+    "id": "service_portal",
+    "title": "信息门户（云中成电）",
+    "name": "信息门户",
+    "category": "public_info",
+    "tags": [
+      "信息门户",
+      "云中成电",
+      "网上服务大厅",
+      "一网通办",
+      "办事大厅",
+      "portal",
+      "online",
+      "信息中心",
+      "服务大厅"
+    ],
+    "summary": "电子科技大学综合信息门户与网上服务大厅（云中成电），访问地址为 https://online.uestc.edu.cn/，提供全校办事流程一网通办与单点登录。",
+    "content": "电子科技大学综合信息门户（云中成电，原网上服务大厅已全面迁移至此）是全校师生的一站式工作台。可在此办理本科生/研究生学籍证明、电子成绩单、请假审批、缴费及访问各类校内系统。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "浏览器访问 https://online.uestc.edu.cn/，使用学号/工号及统一身份认证密码登录。"
+  },
+  {
     "id": "service_1",
     "title": "成电立德树人奖提名推荐",
     "name": "成电立德树人奖提名推荐",
@@ -31,20 +52,26 @@
   },
   {
     "id": "service_student_email",
-    "title": "学生邮箱",
-    "name": "学生邮箱",
+    "title": "电子科技大学学生邮箱",
+    "name": "电子科技大学学生邮箱",
     "category": "public_info",
     "tags": [
+      "电子科技大学学生邮箱",
       "学生邮箱",
+      "成电学生邮箱",
       "邮箱",
       "student mail",
       "网易企业邮箱",
-      "edu邮箱"
+      "edu邮箱",
+      "成电邮箱",
+      "邮箱登录",
+      "邮箱地址",
+      "std.uestc.edu.cn"
     ],
-    "summary": "电子科技大学学生官方邮箱系统，域名为 @std.uestc.edu.cn，支持统一身份认证登录。",
-    "content": "电子科技大学学生邮箱是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
-    "url": "https://mail.std.uestc.edu.cn/",
-    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+    "summary": "电子科技大学学生官方邮箱系统，域名为 @std.uestc.edu.cn，访问地址为 http://mail.std.uestc.edu.cn/，支持统一身份认证登录。",
+    "content": "电子科技大学学生邮箱格式为 学号@std.uestc.edu.cn。学生可直接通过浏览器访问 http://mail.std.uestc.edu.cn/（注意必须使用 HTTP 协议访问）进行收发邮件，首次使用可在统一身份认证登录页激活；也可在信息门户（云中成电）快捷入口进入。",
+    "url": "http://mail.std.uestc.edu.cn/",
+    "guide": "通过浏览器直接访问 http://mail.std.uestc.edu.cn/，使用学号和统一身份认证密码登录。"
   },
   {
     "id": "service_lib_room",
@@ -57,10 +84,10 @@
       "图书馆预约",
       "自习室预约"
     ],
-    "summary": "电子科技大学图书馆研讨室、研修室、报告厅线上预约系统。",
-    "content": "电子科技大学图书馆研修室、报告厅等预约是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
-    "url": "https://room.lib.uestc.edu.cn/",
-    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+    "summary": "电子科技大学图书馆研讨室、研修室、报告厅线上预约系统（需校园网或WebVPN访问）。",
+    "content": "电子科技大学图书馆研修室与研讨空间预约系统（reservelib.uestc.edu.cn），支持在线预约清水河及沙河图书馆研讨室、研修间及学术报告厅（需连接校园网或WebVPN）。",
+    "url": "https://reservelib.uestc.edu.cn/",
+    "guide": "访问 https://reservelib.uestc.edu.cn/ （需在校园网内或通过WebVPN访问），使用统一身份认证登录预约。"
   },
   {
     "id": "service_5",
@@ -146,10 +173,10 @@
       "寝室购电",
       "买电"
     ],
-    "summary": "清水河与沙河双校区学生宿舍电费线上实时缴费充值系统。",
-    "content": "电子科技大学寝室电费充值是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
-    "url": "https://mapp.uestc.cn/site/ipasscd/index",
-    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+    "summary": "清水河与沙河双校区学生宿舍电费线上实时缴费充值系统（微唯校平台动态Token，需通过云中成电门户访问）。",
+    "content": "电子科技大学学生宿舍电费充值（微唯校平台）属于动态鉴权服务，不可直接使用静态外部链接。请登录云中成电（网上服务大厅），在应用列表中找到【寝室电费充值】（应用ID: 402）进入办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "登录云中成电 (https://online.uestc.edu.cn/)，在服务大厅或应用列表中搜索并点击【寝室电费充值】（应用ID: 402）进入。"
   },
   {
     "id": "service_software",
@@ -166,8 +193,8 @@
     ],
     "summary": "电子科技大学正版软件管理与服务平台，为全校师生免费提供 Windows、Office、MATLAB、SPSS 等正版授权与 KMS 激活。",
     "content": "电子科技大学正版软件是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
-    "url": "https://software.uestc.edu.cn/",
-    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+    "url": "https://ms.uestc.edu.cn/",
+    "guide": "访问 https://ms.uestc.edu.cn/ 或云中成电快捷入口，使用统一身份认证学工号登录办理与下载激活。"
   },
   {
     "id": "service_12",
@@ -192,12 +219,14 @@
       "研究生教务",
       "GMIS",
       "开题报告",
-      "硕士选课"
+      "硕士选课",
+      "研究生培养",
+      "研究生选课"
     ],
-    "summary": "电子科技大学研究生院综合管理信息系统（GMIS），涵盖培养方案、选课、开题、答辩与学位申请。",
-    "content": "电子科技大学研究生系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
-    "url": "https://yjsy.uestc.edu.cn/",
-    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+    "summary": "电子科技大学研究生培养管理信息系统（GMIS），涵盖研究生培养方案、选课、开题、答辩与学位申请。",
+    "content": "电子科技大学研究生系统（培养管理信息系统）支持通过统一身份认证 SSO 单点登录，办理研究生选课、开题报告、培养计划与学位答辩等全流程业务。",
+    "url": "https://yjsjy.uestc.edu.cn/pyxx/jzsso/login",
+    "guide": "直接访问 https://yjsjy.uestc.edu.cn/pyxx/jzsso/login 或通过云中成电快捷入口，使用统一身份认证登录办理。"
   },
   {
     "id": "service_smart_student",
@@ -211,10 +240,10 @@
       "奖学金",
       "辅导员"
     ],
-    "summary": "电子科技大学智慧学工服务与线上办理入口。",
-    "content": "电子科技大学智慧学工是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
-    "url": "https://xg.uestc.edu.cn/",
-    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+    "summary": "电子科技大学智慧学工一体化平台，涵盖日常请销假、奖助学金申请、综合素质测评、勤工助学及辅导员事务办理。",
+    "content": "电子科技大学智慧学工平台（jzsz.uestc.edu.cn）面向全校本专科生及研究生提供学生日常事务一站式线上办理，支持请假报备、评奖评优、困难补助申请等。",
+    "url": "https://jzsz.uestc.edu.cn/",
+    "guide": "直接访问 https://jzsz.uestc.edu.cn/ 或通过云中成电快捷入口，使用统一身份认证登录办理。"
   },
   {
     "id": "service_15",
@@ -597,7 +626,7 @@
     "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
   },
   {
-    "id": "service_card_service",
+    "id": "service_card_balance",
     "title": "一卡通余额",
     "name": "一卡通余额",
     "category": "life_service",
@@ -624,10 +653,10 @@
       "报销",
       "财务处"
     ],
-    "summary": "电子科技大学师生缴费服务与线上办理入口。",
-    "content": "电子科技大学师生缴费是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
-    "url": "https://cwsz.uestc.edu.cn/",
-    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+    "summary": "电子科技大学师生综合缴费与财务服务系统（需校园网或WebVPN访问）。",
+    "content": "电子科技大学财务综合查询与缴费系统（cwcx.uestc.edu.cn），提供学费缴纳、财务报销进度查询、工薪发放及个人收入明细查询（需连接校园网或WebVPN）。",
+    "url": "https://cwcx.uestc.edu.cn/",
+    "guide": "访问 https://cwcx.uestc.edu.cn/ （需在校园网内或通过WebVPN访问），使用统一身份认证登录办理。"
   },
   {
     "id": "service_45",
@@ -643,7 +672,7 @@
     "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
   },
   {
-    "id": "service_card_service",
+    "id": "service_card_recharge",
     "title": "一卡通充值",
     "name": "一卡通充值",
     "category": "life_service",
@@ -742,7 +771,7 @@
     "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
   },
   {
-    "id": "service_lib_resources",
+    "id": "service_course_resources",
     "title": "课程数字资源服务平台",
     "name": "课程数字资源服务平台",
     "category": "academic_research",
@@ -759,7 +788,7 @@
     "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
   },
   {
-    "id": "service_finance",
+    "id": "service_finance_system",
     "title": "财务系统",
     "name": "财务系统",
     "category": "finance_procurement",
@@ -769,10 +798,10 @@
       "报销",
       "财务处"
     ],
-    "summary": "电子科技大学财务系统服务与线上办理入口。",
-    "content": "电子科技大学财务系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
-    "url": "https://cwsz.uestc.edu.cn/",
-    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+    "summary": "电子科技大学财务综合查询与管理系统（需校园网或WebVPN访问）。",
+    "content": "电子科技大学财务系统（cwcx.uestc.edu.cn），支持财务综合查询、项目经费额度、报账单进度与收入查询（需连接校园网或WebVPN）。",
+    "url": "https://cwcx.uestc.edu.cn/",
+    "guide": "访问 https://cwcx.uestc.edu.cn/ （需在校园网内或通过WebVPN访问），使用统一身份认证登录办理。"
   },
   {
     "id": "service_55",
@@ -1002,7 +1031,7 @@
     "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
   },
   {
-    "id": "service_card_service",
+    "id": "service_card_system",
     "title": "一卡通系统",
     "name": "一卡通系统",
     "category": "life_service",
@@ -1056,15 +1085,17 @@
       "校历查询",
       "学期校历",
       "放假安排",
-      "寒暑假"
+      "寒暑假",
+      "校历",
+      "学期安排"
     ],
-    "summary": "电子科技大学校历查询服务与线上办理入口。",
-    "content": "电子科技大学校历查询是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
-    "url": "https://www.uestc.edu.cn/xljt.htm",
-    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+    "summary": "电子科技大学官方校历与学期教学周安排查询。",
+    "content": "电子科技大学官方校历公布每学年的行课周数、法定节假日与寒暑假放假起止时间。",
+    "url": "https://www.uestc.edu.cn/",
+    "guide": "访问电子科技大学官方主页（https://www.uestc.edu.cn/）或教务处官网查看最新校历。"
   },
   {
-    "id": "service_jwc",
+    "id": "service_schedule_query",
     "title": "课表查询",
     "name": "课表查询",
     "category": "academic_affairs",
