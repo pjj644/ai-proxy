@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "service_1",
+    "title": "成电立德树人奖提名推荐",
+    "name": "成电立德树人奖提名推荐",
+    "category": "public_info",
+    "tags": [
+      "成电立德树人奖提名推荐"
+    ],
+    "summary": "电子科技大学成电立德树人奖提名推荐服务与线上办理入口。",
+    "content": "电子科技大学成电立德树人奖提名推荐是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_jwc",
+    "title": "教务系统",
+    "name": "教务系统",
+    "category": "academic_affairs",
+    "tags": [
+      "教务系统",
+      "教务处",
+      "选课",
+      "课表",
+      "eams"
+    ],
+    "summary": "电子科技大学本科教务管理系统（EAMS），负责全校本科生的课程选课、课表查询、考试安排与期末成绩评定。",
+    "content": "电子科技大学教务系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://eams.uestc.edu.cn/eams/home!index.action",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_student_email",
+    "title": "学生邮箱",
+    "name": "学生邮箱",
+    "category": "public_info",
+    "tags": [
+      "学生邮箱",
+      "邮箱",
+      "student mail",
+      "网易企业邮箱",
+      "edu邮箱"
+    ],
+    "summary": "电子科技大学学生官方邮箱系统，域名为 @std.uestc.edu.cn，支持统一身份认证登录。",
+    "content": "电子科技大学学生邮箱是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://mail.std.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_lib_room",
+    "title": "图书馆研修室、报告厅等预约",
+    "name": "图书馆研修室、报告厅等预约",
+    "category": "facilities",
+    "tags": [
+      "图书馆研修室、报告厅等预约",
+      "研讨室",
+      "图书馆预约",
+      "自习室预约"
+    ],
+    "summary": "电子科技大学图书馆研讨室、研修室、报告厅线上预约系统。",
+    "content": "电子科技大学图书馆研修室、报告厅等预约是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://room.lib.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_5",
+    "title": "会议室预约",
+    "name": "会议室预约",
+    "category": "public_info",
+    "tags": [
+      "会议室预约"
+    ],
+    "summary": "电子科技大学会议室预约服务与线上办理入口。",
+    "content": "电子科技大学会议室预约是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_lib_resources",
+    "title": "图书馆文献资源",
+    "name": "图书馆文献资源",
+    "category": "academic_research",
+    "tags": [
+      "图书馆文献资源",
+      "知网",
+      "IEEE",
+      "文献检索",
+      "数据库"
+    ],
+    "summary": "电子科技大学图书馆中外文电子数据库与文献检索服务平台。",
+    "content": "电子科技大学图书馆文献资源是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://www.lib.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_7",
+    "title": "成电Seek",
+    "name": "成电Seek",
+    "category": "public_info",
+    "tags": [
+      "成电Seek"
+    ],
+    "summary": "电子科技大学成电Seek服务与线上办理入口。",
+    "content": "电子科技大学成电Seek是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_webvpn",
+    "title": "校园VPN系统",
+    "name": "校园VPN系统",
+    "category": "public_info",
+    "tags": [
+      "校园VPN系统",
+      "WebVPN",
+      "校外访问",
+      "内网"
+    ],
+    "summary": "成电 WebVPN 与 EasyConnect 门户，支持在校外免客户端直接访问校内所有教务与学术资源。",
+    "content": "电子科技大学校园VPN系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://webvpn.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_9",
+    "title": "校级高性能计算平台",
+    "name": "校级高性能计算平台",
+    "category": "public_info",
+    "tags": [
+      "校级高性能计算平台"
+    ],
+    "summary": "电子科技大学校级高性能计算平台服务与线上办理入口。",
+    "content": "电子科技大学校级高性能计算平台是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_dorm_power",
+    "title": "寝室电费充值",
+    "name": "寝室电费充值",
+    "category": "life_service",
+    "tags": [
+      "寝室电费充值",
+      "宿舍电费",
+      "充水费",
+      "寝室购电",
+      "买电"
+    ],
+    "summary": "清水河与沙河双校区学生宿舍电费线上实时缴费充值系统。",
+    "content": "电子科技大学寝室电费充值是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://mapp.uestc.cn/site/ipasscd/index",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_software",
+    "title": "正版软件",
+    "name": "正版软件",
+    "category": "public_info",
+    "tags": [
+      "正版软件",
+      "Windows激活",
+      "Office激活",
+      "MATLAB",
+      "正版化",
+      "KMS"
+    ],
+    "summary": "电子科技大学正版软件管理与服务平台，为全校师生免费提供 Windows、Office、MATLAB、SPSS 等正版授权与 KMS 激活。",
+    "content": "电子科技大学正版软件是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://software.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_12",
+    "title": "保密培训系统",
+    "name": "保密培训系统",
+    "category": "public_info",
+    "tags": [
+      "保密培训系统"
+    ],
+    "summary": "电子科技大学保密培训系统服务与线上办理入口。",
+    "content": "电子科技大学保密培训系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_grad_school",
+    "title": "研究生系统",
+    "name": "研究生系统",
+    "category": "academic_affairs",
+    "tags": [
+      "研究生系统",
+      "研究生教务",
+      "GMIS",
+      "开题报告",
+      "硕士选课"
+    ],
+    "summary": "电子科技大学研究生院综合管理信息系统（GMIS），涵盖培养方案、选课、开题、答辩与学位申请。",
+    "content": "电子科技大学研究生系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://yjsy.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_smart_student",
+    "title": "智慧学工",
+    "name": "智慧学工",
+    "category": "student_service",
+    "tags": [
+      "智慧学工",
+      "学工系统",
+      "请假",
+      "奖学金",
+      "辅导员"
+    ],
+    "summary": "电子科技大学智慧学工服务与线上办理入口。",
+    "content": "电子科技大学智慧学工是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://xg.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_15",
+    "title": "教师一表通",
+    "name": "教师一表通",
+    "category": "public_info",
+    "tags": [
+      "教师一表通"
+    ],
+    "summary": "电子科技大学教师一表通服务与线上办理入口。",
+    "content": "电子科技大学教师一表通是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_16",
+    "title": "“成电党员慧学” 集中大课系统",
+    "name": "“成电党员慧学” 集中大课系统",
+    "category": "public_info",
+    "tags": [
+      "“成电党员慧学” 集中大课系统"
+    ],
+    "summary": "电子科技大学“成电党员慧学” 集中大课系统服务与线上办理入口。",
+    "content": "电子科技大学“成电党员慧学” 集中大课系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_17",
+    "title": "资产验收管理系统",
+    "name": "资产验收管理系统",
+    "category": "public_info",
+    "tags": [
+      "资产验收管理系统"
+    ],
+    "summary": "电子科技大学资产验收管理系统服务与线上办理入口。",
+    "content": "电子科技大学资产验收管理系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_18",
+    "title": "本科生学科竞赛管理系统",
+    "name": "本科生学科竞赛管理系统",
+    "category": "public_info",
+    "tags": [
+      "本科生学科竞赛管理系统"
+    ],
+    "summary": "电子科技大学本科生学科竞赛管理系统服务与线上办理入口。",
+    "content": "电子科技大学本科生学科竞赛管理系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_19",
+    "title": "本科毕业设计管理系统",
+    "name": "本科毕业设计管理系统",
+    "category": "public_info",
+    "tags": [
+      "本科毕业设计管理系统"
+    ],
+    "summary": "电子科技大学本科毕业设计管理系统服务与线上办理入口。",
+    "content": "电子科技大学本科毕业设计管理系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_20",
+    "title": "大学生创新训练智能管理系统",
+    "name": "大学生创新训练智能管理系统",
+    "category": "public_info",
+    "tags": [
+      "大学生创新训练智能管理系统"
+    ],
+    "summary": "电子科技大学大学生创新训练智能管理系统服务与线上办理入口。",
+    "content": "电子科技大学大学生创新训练智能管理系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_21",
+    "title": "迎新系统",
+    "name": "迎新系统",
+    "category": "public_info",
+    "tags": [
+      "迎新系统"
+    ],
+    "summary": "电子科技大学迎新系统服务与线上办理入口。",
+    "content": "电子科技大学迎新系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_22",
+    "title": "本科生离校系统",
+    "name": "本科生离校系统",
+    "category": "public_info",
+    "tags": [
+      "本科生离校系统"
+    ],
+    "summary": "电子科技大学本科生离校系统服务与线上办理入口。",
+    "content": "电子科技大学本科生离校系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_23",
+    "title": "高基系统",
+    "name": "高基系统",
+    "category": "public_info",
+    "tags": [
+      "高基系统"
+    ],
+    "summary": "电子科技大学高基系统服务与线上办理入口。",
+    "content": "电子科技大学高基系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_24",
+    "title": "安全教育与考试系统",
+    "name": "安全教育与考试系统",
+    "category": "public_info",
+    "tags": [
+      "安全教育与考试系统"
+    ],
+    "summary": "电子科技大学安全教育与考试系统服务与线上办理入口。",
+    "content": "电子科技大学安全教育与考试系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_25",
+    "title": "实验室综合管理系统",
+    "name": "实验室综合管理系统",
+    "category": "public_info",
+    "tags": [
+      "实验室综合管理系统"
+    ],
+    "summary": "电子科技大学实验室综合管理系统服务与线上办理入口。",
+    "content": "电子科技大学实验室综合管理系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_26",
+    "title": "网空中心审核系统",
+    "name": "网空中心审核系统",
+    "category": "public_info",
+    "tags": [
+      "网空中心审核系统"
+    ],
+    "summary": "电子科技大学网空中心审核系统服务与线上办理入口。",
+    "content": "电子科技大学网空中心审核系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_27",
+    "title": "高水平论文发表必要性审核",
+    "name": "高水平论文发表必要性审核",
+    "category": "public_info",
+    "tags": [
+      "高水平论文发表必要性审核"
+    ],
+    "summary": "电子科技大学高水平论文发表必要性审核服务与线上办理入口。",
+    "content": "电子科技大学高水平论文发表必要性审核是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_28",
+    "title": "服务电话查询",
+    "name": "服务电话查询",
+    "category": "public_info",
+    "tags": [
+      "服务电话查询"
+    ],
+    "summary": "电子科技大学服务电话查询服务与线上办理入口。",
+    "content": "电子科技大学服务电话查询是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_29",
+    "title": "成电资源",
+    "name": "成电资源",
+    "category": "public_info",
+    "tags": [
+      "成电资源"
+    ],
+    "summary": "电子科技大学成电资源服务与线上办理入口。",
+    "content": "电子科技大学成电资源是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_30",
+    "title": "大宗物品出校出楼申请",
+    "name": "大宗物品出校出楼申请",
+    "category": "public_info",
+    "tags": [
+      "大宗物品出校出楼申请"
+    ],
+    "summary": "电子科技大学大宗物品出校出楼申请服务与线上办理入口。",
+    "content": "电子科技大学大宗物品出校出楼申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_31",
+    "title": "沙河个人校园网络账号申请",
+    "name": "沙河个人校园网络账号申请",
+    "category": "public_info",
+    "tags": [
+      "沙河个人校园网络账号申请"
+    ],
+    "summary": "电子科技大学沙河个人校园网络账号申请服务与线上办理入口。",
+    "content": "电子科技大学沙河个人校园网络账号申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_32",
+    "title": "新进教职工周转房办理申请",
+    "name": "新进教职工周转房办理申请",
+    "category": "public_info",
+    "tags": [
+      "新进教职工周转房办理申请"
+    ],
+    "summary": "电子科技大学新进教职工周转房办理申请服务与线上办理入口。",
+    "content": "电子科技大学新进教职工周转房办理申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_bbs_qingshui",
+    "title": "清水河畔",
+    "name": "清水河畔",
+    "category": "campus_life",
+    "tags": [
+      "清水河畔",
+      "成电BBS",
+      "成电论坛",
+      "二手交易",
+      "拼车"
+    ],
+    "summary": "电子科技大学官方学生综合社区论坛，成电最具人气的线上交流平台。",
+    "content": "电子科技大学清水河畔是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://bbs.uestc.edu.cn/new",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_34",
+    "title": "师生办事流程检索平台",
+    "name": "师生办事流程检索平台",
+    "category": "public_info",
+    "tags": [
+      "师生办事流程检索平台"
+    ],
+    "summary": "电子科技大学师生办事流程检索平台服务与线上办理入口。",
+    "content": "电子科技大学师生办事流程检索平台是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_35",
+    "title": "研究生成绩复查统计报表-全部",
+    "name": "研究生成绩复查统计报表-全部",
+    "category": "public_info",
+    "tags": [
+      "研究生成绩复查统计报表-全部"
+    ],
+    "summary": "电子科技大学研究生成绩复查统计报表-全部服务与线上办理入口。",
+    "content": "电子科技大学研究生成绩复查统计报表-全部是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_36",
+    "title": "数据共享申请",
+    "name": "数据共享申请",
+    "category": "public_info",
+    "tags": [
+      "数据共享申请"
+    ],
+    "summary": "电子科技大学数据共享申请服务与线上办理入口。",
+    "content": "电子科技大学数据共享申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_cert_36",
+    "title": "政审、无犯罪记录证明申请",
+    "name": "政审、无犯罪记录证明申请",
+    "category": "certificate_service",
+    "tags": [
+      "政审、无犯罪记录证明申请",
+      "证明开具",
+      "可信电子凭证",
+      "电子印章",
+      "成绩单"
+    ],
+    "summary": "电子科技大学政审、无犯罪记录证明申请服务与线上办理入口。",
+    "content": "电子科技大学政审、无犯罪记录证明申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_38",
+    "title": "信息中心线上新闻及通知发布管理流程",
+    "name": "信息中心线上新闻及通知发布管理流程",
+    "category": "public_info",
+    "tags": [
+      "信息中心线上新闻及通知发布管理流程"
+    ],
+    "summary": "电子科技大学信息中心线上新闻及通知发布管理流程服务与线上办理入口。",
+    "content": "电子科技大学信息中心线上新闻及通知发布管理流程是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_cert_38",
+    "title": "出国人员无犯罪记录证明申请",
+    "name": "出国人员无犯罪记录证明申请",
+    "category": "certificate_service",
+    "tags": [
+      "出国人员无犯罪记录证明申请",
+      "证明开具",
+      "可信电子凭证",
+      "电子印章",
+      "成绩单"
+    ],
+    "summary": "电子科技大学出国人员无犯罪记录证明申请服务与线上办理入口。",
+    "content": "电子科技大学出国人员无犯罪记录证明申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_bus_schedule",
+    "title": "班车查询",
+    "name": "班车查询",
+    "category": "bus",
+    "tags": [
+      "班车查询",
+      "校车",
+      "校车时刻表",
+      "清水河班车",
+      "沙河班车"
+    ],
+    "summary": "清水河校区 ↔ 沙河校区两校区往返班车官方时刻表与发车信息。",
+    "content": "电子科技大学班车查询是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_41",
+    "title": "个人借阅记录查询",
+    "name": "个人借阅记录查询",
+    "category": "public_info",
+    "tags": [
+      "个人借阅记录查询"
+    ],
+    "summary": "电子科技大学个人借阅记录查询服务与线上办理入口。",
+    "content": "电子科技大学个人借阅记录查询是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_42",
+    "title": "电子卡交易记录",
+    "name": "电子卡交易记录",
+    "category": "public_info",
+    "tags": [
+      "电子卡交易记录"
+    ],
+    "summary": "电子科技大学电子卡交易记录服务与线上办理入口。",
+    "content": "电子科技大学电子卡交易记录是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_card_service",
+    "title": "一卡通余额",
+    "name": "一卡通余额",
+    "category": "life_service",
+    "tags": [
+      "一卡通余额",
+      "校园卡",
+      "饭卡",
+      "充值",
+      "余额"
+    ],
+    "summary": "成电校园一卡通（实体卡/虚拟电子卡）实时余额查询与在线充值服务。",
+    "content": "电子科技大学一卡通余额是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://mapp.uestc.cn/site/ipasscd/index",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_finance",
+    "title": "师生缴费",
+    "name": "师生缴费",
+    "category": "finance_procurement",
+    "tags": [
+      "师生缴费",
+      "学费",
+      "报销",
+      "财务处"
+    ],
+    "summary": "电子科技大学师生缴费服务与线上办理入口。",
+    "content": "电子科技大学师生缴费是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://cwsz.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_45",
+    "title": "师生服务中心服务事项",
+    "name": "师生服务中心服务事项",
+    "category": "public_info",
+    "tags": [
+      "师生服务中心服务事项"
+    ],
+    "summary": "电子科技大学师生服务中心服务事项服务与线上办理入口。",
+    "content": "电子科技大学师生服务中心服务事项是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_card_service",
+    "title": "一卡通充值",
+    "name": "一卡通充值",
+    "category": "life_service",
+    "tags": [
+      "一卡通充值",
+      "校园卡",
+      "饭卡",
+      "充值",
+      "余额"
+    ],
+    "summary": "成电校园一卡通（实体卡/虚拟电子卡）实时余额查询与在线充值服务。",
+    "content": "电子科技大学一卡通充值是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://mapp.uestc.cn/site/ipasscd/index",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_47",
+    "title": "成电inno Lab双创实践教育平台",
+    "name": "成电inno Lab双创实践教育平台",
+    "category": "public_info",
+    "tags": [
+      "成电inno Lab双创实践教育平台"
+    ],
+    "summary": "电子科技大学成电inno Lab双创实践教育平台服务与线上办理入口。",
+    "content": "电子科技大学成电inno Lab双创实践教育平台是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_48",
+    "title": "虚拟仿真实验教学平台",
+    "name": "虚拟仿真实验教学平台",
+    "category": "public_info",
+    "tags": [
+      "虚拟仿真实验教学平台"
+    ],
+    "summary": "电子科技大学虚拟仿真实验教学平台服务与线上办理入口。",
+    "content": "电子科技大学虚拟仿真实验教学平台是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_49",
+    "title": "新生选房",
+    "name": "新生选房",
+    "category": "public_info",
+    "tags": [
+      "新生选房"
+    ],
+    "summary": "电子科技大学新生选房服务与线上办理入口。",
+    "content": "电子科技大学新生选房是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_50",
+    "title": "学位论文提交",
+    "name": "学位论文提交",
+    "category": "public_info",
+    "tags": [
+      "学位论文提交"
+    ],
+    "summary": "电子科技大学学位论文提交服务与线上办理入口。",
+    "content": "电子科技大学学位论文提交是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_51",
+    "title": "文艺成电",
+    "name": "文艺成电",
+    "category": "public_info",
+    "tags": [
+      "文艺成电"
+    ],
+    "summary": "电子科技大学文艺成电服务与线上办理入口。",
+    "content": "电子科技大学文艺成电是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_cert_51",
+    "title": "本科生在读证明",
+    "name": "本科生在读证明",
+    "category": "certificate_service",
+    "tags": [
+      "本科生在读证明",
+      "证明开具",
+      "可信电子凭证",
+      "电子印章",
+      "成绩单"
+    ],
+    "summary": "电子科技大学本科生在读证明服务与线上办理入口。",
+    "content": "电子科技大学本科生在读证明是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_lib_resources",
+    "title": "课程数字资源服务平台",
+    "name": "课程数字资源服务平台",
+    "category": "academic_research",
+    "tags": [
+      "课程数字资源服务平台",
+      "知网",
+      "IEEE",
+      "文献检索",
+      "数据库"
+    ],
+    "summary": "电子科技大学图书馆中外文电子数据库与文献检索服务平台。",
+    "content": "电子科技大学课程数字资源服务平台是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://www.lib.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_finance",
+    "title": "财务系统",
+    "name": "财务系统",
+    "category": "finance_procurement",
+    "tags": [
+      "财务系统",
+      "学费",
+      "报销",
+      "财务处"
+    ],
+    "summary": "电子科技大学财务系统服务与线上办理入口。",
+    "content": "电子科技大学财务系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://cwsz.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_55",
+    "title": "2025级新生体检PPD强阳性登记",
+    "name": "2025级新生体检PPD强阳性登记",
+    "category": "public_info",
+    "tags": [
+      "2025级新生体检PPD强阳性登记"
+    ],
+    "summary": "电子科技大学2025级新生体检PPD强阳性登记服务与线上办理入口。",
+    "content": "电子科技大学2025级新生体检PPD强阳性登记是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_cert_55",
+    "title": "本科生电子成绩单",
+    "name": "本科生电子成绩单",
+    "category": "certificate_service",
+    "tags": [
+      "本科生电子成绩单",
+      "证明开具",
+      "可信电子凭证",
+      "电子印章",
+      "成绩单"
+    ],
+    "summary": "电子科技大学本科生电子成绩单服务与线上办理入口。",
+    "content": "电子科技大学本科生电子成绩单是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_57",
+    "title": "思想政治状况审查",
+    "name": "思想政治状况审查",
+    "category": "public_info",
+    "tags": [
+      "思想政治状况审查"
+    ],
+    "summary": "电子科技大学思想政治状况审查服务与线上办理入口。",
+    "content": "电子科技大学思想政治状况审查是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_58",
+    "title": "试读申请",
+    "name": "试读申请",
+    "category": "public_info",
+    "tags": [
+      "试读申请"
+    ],
+    "summary": "电子科技大学试读申请服务与线上办理入口。",
+    "content": "电子科技大学试读申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_59",
+    "title": "退学申请",
+    "name": "退学申请",
+    "category": "public_info",
+    "tags": [
+      "退学申请"
+    ],
+    "summary": "电子科技大学退学申请服务与线上办理入口。",
+    "content": "电子科技大学退学申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_60",
+    "title": "复学申请",
+    "name": "复学申请",
+    "category": "public_info",
+    "tags": [
+      "复学申请"
+    ],
+    "summary": "电子科技大学复学申请服务与线上办理入口。",
+    "content": "电子科技大学复学申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_61",
+    "title": "休学申请",
+    "name": "休学申请",
+    "category": "public_info",
+    "tags": [
+      "休学申请"
+    ],
+    "summary": "电子科技大学休学申请服务与线上办理入口。",
+    "content": "电子科技大学休学申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_62",
+    "title": "本科实验教学资源管理与服务平台",
+    "name": "本科实验教学资源管理与服务平台",
+    "category": "public_info",
+    "tags": [
+      "本科实验教学资源管理与服务平台"
+    ],
+    "summary": "电子科技大学本科实验教学资源管理与服务平台服务与线上办理入口。",
+    "content": "电子科技大学本科实验教学资源管理与服务平台是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_cert_62",
+    "title": "中文成绩学籍证明",
+    "name": "中文成绩学籍证明",
+    "category": "certificate_service",
+    "tags": [
+      "中文成绩学籍证明",
+      "证明开具",
+      "可信电子凭证",
+      "电子印章",
+      "成绩单"
+    ],
+    "summary": "电子科技大学中文成绩学籍证明服务与线上办理入口。",
+    "content": "电子科技大学中文成绩学籍证明是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_64",
+    "title": "盖学院章",
+    "name": "盖学院章",
+    "category": "public_info",
+    "tags": [
+      "盖学院章"
+    ],
+    "summary": "电子科技大学盖学院章服务与线上办理入口。",
+    "content": "电子科技大学盖学院章是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_cert_64",
+    "title": "电子证明验证",
+    "name": "电子证明验证",
+    "category": "certificate_service",
+    "tags": [
+      "电子证明验证",
+      "证明开具",
+      "可信电子凭证",
+      "电子印章",
+      "成绩单"
+    ],
+    "summary": "电子科技大学电子证明验证服务与线上办理入口。",
+    "content": "电子科技大学电子证明验证是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_66",
+    "title": "本科生教学事务特殊事项申请",
+    "name": "本科生教学事务特殊事项申请",
+    "category": "public_info",
+    "tags": [
+      "本科生教学事务特殊事项申请"
+    ],
+    "summary": "电子科技大学本科生教学事务特殊事项申请服务与线上办理入口。",
+    "content": "电子科技大学本科生教学事务特殊事项申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_67",
+    "title": "合同管理",
+    "name": "合同管理",
+    "category": "public_info",
+    "tags": [
+      "合同管理"
+    ],
+    "summary": "电子科技大学合同管理服务与线上办理入口。",
+    "content": "电子科技大学合同管理是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_faculty",
+    "title": "教师主页",
+    "name": "教师主页",
+    "category": "public_info",
+    "tags": [
+      "教师主页",
+      "找导师",
+      "学者介绍",
+      "研究方向"
+    ],
+    "summary": "电子科技大学教师主页服务与线上办理入口。",
+    "content": "电子科技大学教师主页是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://faculty.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_gis_map",
+    "title": "校园地图",
+    "name": "校园地图",
+    "category": "public_info",
+    "tags": [
+      "校园地图",
+      "GIS地图",
+      "楼宇导航",
+      "清水河地图",
+      "沙河地图"
+    ],
+    "summary": "电子科技大学官方三维实景与矢量电子地图导航服务平台。",
+    "content": "电子科技大学校园地图是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://gis.uestc.edu.cn/#/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_70",
+    "title": "防病毒网站",
+    "name": "防病毒网站",
+    "category": "public_info",
+    "tags": [
+      "防病毒网站"
+    ],
+    "summary": "电子科技大学防病毒网站服务与线上办理入口。",
+    "content": "电子科技大学防病毒网站是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_card_service",
+    "title": "一卡通系统",
+    "name": "一卡通系统",
+    "category": "life_service",
+    "tags": [
+      "一卡通系统",
+      "校园卡",
+      "饭卡",
+      "充值",
+      "余额"
+    ],
+    "summary": "成电校园一卡通（实体卡/虚拟电子卡）实时余额查询与在线充值服务。",
+    "content": "电子科技大学一卡通系统是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://mapp.uestc.cn/site/ipasscd/index",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_mooc",
+    "title": "成电慕课",
+    "name": "成电慕课",
+    "category": "academic_affairs",
+    "tags": [
+      "成电慕课",
+      "MOOC",
+      "在线选修课",
+      "精品课"
+    ],
+    "summary": "电子科技大学成电慕课服务与线上办理入口。",
+    "content": "电子科技大学成电慕课是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://mooc.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_73",
+    "title": "大仪论证",
+    "name": "大仪论证",
+    "category": "public_info",
+    "tags": [
+      "大仪论证"
+    ],
+    "summary": "电子科技大学大仪论证服务与线上办理入口。",
+    "content": "电子科技大学大仪论证是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_calendar",
+    "title": "校历查询",
+    "name": "校历查询",
+    "category": "academic_affairs",
+    "tags": [
+      "校历查询",
+      "学期校历",
+      "放假安排",
+      "寒暑假"
+    ],
+    "summary": "电子科技大学校历查询服务与线上办理入口。",
+    "content": "电子科技大学校历查询是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://www.uestc.edu.cn/xljt.htm",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_jwc",
+    "title": "课表查询",
+    "name": "课表查询",
+    "category": "academic_affairs",
+    "tags": [
+      "课表查询",
+      "教务处",
+      "选课",
+      "课表",
+      "eams"
+    ],
+    "summary": "电子科技大学本科教务管理系统（EAMS），负责全校本科生的课程选课、课表查询、考试安排与期末成绩评定。",
+    "content": "电子科技大学课表查询是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://eams.uestc.edu.cn/eams/home!index.action",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_76",
+    "title": "新生入学体检",
+    "name": "新生入学体检",
+    "category": "public_info",
+    "tags": [
+      "新生入学体检"
+    ],
+    "summary": "电子科技大学新生入学体检服务与线上办理入口。",
+    "content": "电子科技大学新生入学体检是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_77",
+    "title": "出国（境）申请",
+    "name": "出国（境）申请",
+    "category": "public_info",
+    "tags": [
+      "出国（境）申请"
+    ],
+    "summary": "电子科技大学出国（境）申请服务与线上办理入口。",
+    "content": "电子科技大学出国（境）申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_78",
+    "title": "查收查引申请",
+    "name": "查收查引申请",
+    "category": "public_info",
+    "tags": [
+      "查收查引申请"
+    ],
+    "summary": "电子科技大学查收查引申请服务与线上办理入口。",
+    "content": "电子科技大学查收查引申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_cert_78",
+    "title": "毕业生英文成绩及学籍证明档案服务",
+    "name": "毕业生英文成绩及学籍证明档案服务",
+    "category": "certificate_service",
+    "tags": [
+      "毕业生英文成绩及学籍证明档案服务",
+      "证明开具",
+      "可信电子凭证",
+      "电子印章",
+      "成绩单"
+    ],
+    "summary": "电子科技大学毕业生英文成绩及学籍证明档案服务服务与线上办理入口。",
+    "content": "电子科技大学毕业生英文成绩及学籍证明档案服务是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  },
+  {
+    "id": "service_80",
+    "title": "学生保留学籍申请",
+    "name": "学生保留学籍申请",
+    "category": "public_info",
+    "tags": [
+      "学生保留学籍申请"
+    ],
+    "summary": "电子科技大学学生保留学籍申请服务与线上办理入口。",
+    "content": "电子科技大学学生保留学籍申请是全校师生线上核心业务之一，可通过统一身份认证便捷办理。",
+    "url": "https://online.uestc.edu.cn/",
+    "guide": "访问云中成电或点击链接，使用统一身份认证学工号登录办理。"
+  }
+]

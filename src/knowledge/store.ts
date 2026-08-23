@@ -82,6 +82,7 @@ export class CampusKnowledgeStore {
         const summaryLower = item.summary.toLowerCase()
         const contentLower = item.content.toLowerCase()
         const detailsLower = (item.details || '').toLowerCase()
+        const guideLower = (item.guide || '').toLowerCase()
         const tagsLower = item.tags.map((t) => t.toLowerCase())
 
         // 1. 完整查询命中（最高优先级）
@@ -90,6 +91,7 @@ export class CampusKnowledgeStore {
         if (summaryLower.includes(fullQuery)) score += 20
         if (contentLower.includes(fullQuery)) score += 10
         if (detailsLower.includes(fullQuery)) score += 5
+        if (guideLower.includes(fullQuery)) score += 5
 
         // 2. Base Token 命中
         for (const token of baseTokens) {
@@ -98,6 +100,7 @@ export class CampusKnowledgeStore {
           if (summaryLower.includes(token)) score += 8
           if (contentLower.includes(token)) score += 4
           if (detailsLower.includes(token)) score += 2
+          if (guideLower.includes(token)) score += 2
         }
 
         // 3. N-Gram 语义片段加权
@@ -118,6 +121,18 @@ export class CampusKnowledgeStore {
     }
 
     return filtered.slice(0, limit)
+  }
+
+  searchServices(query: string, limit: number = 5): CampusKnowledgeItem[] {
+    const q = query.toLowerCase().trim()
+    return this.items
+      .filter((item) =>
+        item.title.toLowerCase().includes(q) ||
+        item.tags.some((t) => t.toLowerCase().includes(q)) ||
+        item.summary.toLowerCase().includes(q) ||
+        (item.guide && item.guide.toLowerCase().includes(q))
+      )
+      .slice(0, limit)
   }
 
   getAll(category?: string): CampusKnowledgeItem[] {
