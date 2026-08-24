@@ -27,7 +27,6 @@ export const toolMeta: Record<string, ToolMeta> = {
   // 高阶辅助工具
   ask_user_clarification: { requiresConfirmation: false, riskLevel: 'low' },
   generate_study_plan: { requiresConfirmation: false, riskLevel: 'low' },
-  parse_text_to_schedule: { requiresConfirmation: false, riskLevel: 'low' },
   get_current_page_context: { requiresConfirmation: false, riskLevel: 'low' },
   execute_page_action: { requiresConfirmation: false, riskLevel: 'low' },
 
@@ -94,11 +93,21 @@ export const tools: StructuredTool[] = [
           dayOfWeek: z.number().optional().describe('星期几（1=周一 ... 7=周日）'),
           keyword: z.string().optional().describe('关键词过滤（匹配课程名/考试名/日程标题/地点）'),
           teacher: z.string().optional().describe('教师姓名过滤（针对 course）'),
-          room: z.string().optional().describe('教室/地点过滤'),
+          room: z
+            .string()
+            .optional()
+            .describe(
+              '教室/地点过滤，格式为「楼栋 房间号」并保留中间空格，如 "品学楼 B303"、"品学楼 A410"。用户问"我在XX楼XXX上哪些课"时必须用 room 过滤，不要错放进 keyword',
+            ),
           upcomingOnly: z.boolean().optional().describe('仅查询未来即将到来的项目（针对 exam/schedule）'),
           semesterId: z.number().optional().describe('学期ID过滤（针对 grade/exam/course）'),
-          minGpa: z.number().optional().describe('最低绩点（针对 grade）'),
-          maxGpa: z.number().optional().describe('最高绩点（针对 grade）'),
+          minGpa: z
+            .number()
+            .optional()
+            .describe(
+              '最低绩点下限（针对 grade）。用户用分数表述时按 85分≈3.7、90分≈4.0 折算：例"绩点3.7或85分以上的科目" → { "minGpa": 3.7 }',
+            ),
+          maxGpa: z.number().optional().describe('最高绩点上限（针对 grade），取值示例 4.0'),
           type: z.string().optional().describe('日程类型过滤：custom(自定义), assignment(作业), course(课程), exam(考试)'),
           startDate: z.string().optional().describe('起始日期 YYYY-MM-DD（针对 calendar/schedule）'),
           endDate: z.string().optional().describe('结束日期 YYYY-MM-DD（针对 calendar/schedule）'),
@@ -187,7 +196,7 @@ export const tools: StructuredTool[] = [
   tool(deviceStub, {
     name: 'app_pipeline',
     description:
-      '【声明式流水线执行工具】当遇到复合任务时（如"查下周二空闲时间 ➔ 创建自习日程 ➔ 写入日历"），一次性生成有序的原子步骤列表由端侧批量执行，避免多次网络往返。',
+      '【声明式流水线执行工具】当单个请求包含两个及以上有序动作或带条件分支的组合任务时必须使用本工具（典型句式："先…再…"、"如果…就…"、"顺便帮我…"。例如"先帮我查一下这周五下午有没有课，如果没有的话就建一个15:00健身的日程"应拆为 step1 app_data_query 查课 + step2 app_data_mutate 创建日程 一次性下发）。仅含单一动作的请求不要使用。',
     schema: z.object({
       steps: z
         .array(
@@ -219,17 +228,11 @@ export const tools: StructuredTool[] = [
   }),
   tool(deviceStub, {
     name: 'generate_study_plan',
-    description: '分析用户所有即将到来的考试科目，结合剩余天数与难易度，自动生成合理的考前每日复习冲刺任务计划',
+    description:
+      '当用户明确要求制定复习计划、学习规划、考前突击安排（如"帮我根据剩余天数规划一个考前突击复习计划"）时直接调用。工具内部自动分析用户所有即将到来的考试科目、剩余天数与难易度并生成每日复习冲刺任务，因此调用前无需再用 app_data_query 查询考试列表，也不要向用户反问补充信息',
     schema: z.object({
       dailyHours: z.number().optional().describe('每日可用复习小时数，默认 4 小时'),
       focusCourse: z.string().optional().describe('重点突击的课程名称，可选'),
-    }),
-  }),
-  tool(deviceStub, {
-    name: 'parse_text_to_schedule',
-    description: '从自然语言通知文本、讲座通知、作业通知中智能提取事件名称、日期、开始与结束时间、地点，并直接准备日程结构',
-    schema: z.object({
-      rawText: z.string().describe('用户提供的通知或活动原始文本内容'),
     }),
   }),
   tool(deviceStub, {

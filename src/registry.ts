@@ -42,7 +42,7 @@ class PendingToolRegistry {
     for (const tc of toolCalls) {
       if (tc.name === 'app_pipeline' || tc.name === 'app_data_mutate' || tc.name === 'app_control') {
         maxTimeout = Math.max(maxTimeout, 30000) // 变更或流水线 30s
-      } else if (tc.name === 'campus_search' || tc.name === 'parse_text_to_schedule' || tc.name === 'generate_study_plan') {
+      } else if (tc.name === 'campus_search' || tc.name === 'generate_study_plan') {
         maxTimeout = Math.max(maxTimeout, 15000) // 搜索或算法处理 15s
       } else {
         maxTimeout = Math.max(maxTimeout, 10000) // 本地数据查询 10s
