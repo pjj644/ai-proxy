@@ -226,7 +226,7 @@ app.post('/api/chat', rateLimiter(30), verifyRequestSecurity, validatePayloadBou
     send({ type: 'status', status: 'thinking', message: '正在理解您的问题与上下文...' })
 
     const config = { configurable: { thread_id: sessionId }, recursionLimit: 25 }
-    let input: any = { messages: [new HumanMessage(preprocess.enrichedMessage)] }
+    let input: any = { messages: [new HumanMessage(preprocess.cleanedMessage)] }
 
     while (true) {
       const stream = await graph.stream(input, { ...config, streamMode: ['messages'] })

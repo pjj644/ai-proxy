@@ -213,7 +213,7 @@ export const EVAL_DATASET: TestCase[] = [
     id: 'C04_CAMPUS_CARD',
     category: 'CAMPUS_SERVICE_URLS',
     userQuery: '我想在手机上查校园卡饭卡余额，去哪里查？',
-    expectedUrls: ['https://mapp.uestc.cn/site/ipasscd/index'],
+    expectedUrls: ['https://mapp.uestc.edu.cn/site/ipasscd/index'],
     description: '一卡通掌上校园链接',
   },
   {

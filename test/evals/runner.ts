@@ -131,7 +131,7 @@ async function runSingleTestCase(testCase: TestCase, index: number, total: numbe
   } else {
     // 2. LangGraph 状态图驱动
     const config = { configurable: { thread_id: sessionId }, recursionLimit: 10 }
-    let input: any = { messages: [new HumanMessage(preprocess.enrichedMessage)] }
+    let input: any = { messages: [new HumanMessage(preprocess.cleanedMessage)] }
 
     let streamTurnCount = 0
     while (streamTurnCount < 5) {

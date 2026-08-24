@@ -131,7 +131,7 @@ export function evaluateDeterministic(
   const allowedUrlPrefixes = [
     'http://mail.std.uestc.edu.cn',
     'https://online.uestc.edu.cn',
-    'https://mapp.uestc.cn',
+    'https://mapp.uestc.edu.cn',
     'https://ms.uestc.edu.cn',
     'https://reservelib.uestc.edu.cn',
     'https://webvpn.uestc.edu.cn',

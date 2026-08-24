@@ -142,12 +142,10 @@ export function preprocessInput(
     console.error('[preprocess] RAG search error:', e)
   }
 
-  const enriched = `${contextPrefix}\n${cleaned}`
-
   return {
     cleanedMessage: cleaned,
     isQuickIntent: false,
     isInjected: false,
-    enrichedMessage: enriched,
+    enrichedMessage: cleaned,
   }
 }
