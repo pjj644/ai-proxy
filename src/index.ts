@@ -1,5 +1,8 @@
 import 'dotenv/config'
+import fs from 'fs'
+import path from 'path'
 import express, { Request, Response } from 'express'
+import { fileURLToPath } from 'url'
 import { HumanMessage } from '@langchain/core/messages'
 import { Command } from '@langchain/langgraph'
 import { graph, ToolResultInput } from './graph'
@@ -7,10 +10,14 @@ import { getToolMeta } from './tools'
 import { registry } from './registry'
 import { parseScheduleFromImage } from './vision'
 import { campusKnowledge } from './knowledge/store'
+import { buildBusSchedulePayload, buildGuidesPayload } from './knowledge/api'
 import { searchJwcWebsite } from './jwcScraper'
 import { preprocessInput } from './preprocess'
 import { scrubThoughtTags, maskSensitiveInfo } from './postprocess'
 import type { ToolCallReq, ToolCallWithMeta, TurnTelemetry } from './types'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 import { verifyRequestSecurity, rateLimiter, validatePayloadBoundaries } from './security'
 
@@ -41,6 +48,57 @@ app.get('/health', (_req: Request, res: Response) => {
     timestamp: Date.now(),
     activeSessions: activeSessionLocks.size,
   })
+})
+
+// ============ T5b 应用配置端点 ============
+
+// 应用静态配置（学期锚点等），启动后首次访问读取并缓存
+let cachedAppConfig: Record<string, unknown> | null = null
+function loadAppConfig(): Record<string, unknown> {
+  if (cachedAppConfig === null) {
+    try {
+      const raw = fs.readFileSync(path.join(__dirname, 'config', 'appConfig.json'), 'utf-8')
+      cachedAppConfig = JSON.parse(raw) as Record<string, unknown>
+    } catch (e) {
+      console.error('[config] failed to load appConfig.json:', e)
+      cachedAppConfig = {}
+    }
+  }
+  return cachedAppConfig
+}
+
+/**
+ * GET /api/v1/config/app-config —— 下发学期开始日期、基准学期 ID 等应用级配置。
+ * 响应形状：{ semesterStartDate, baseSemesterId, semesterLabel, generatedAt }。
+ *
+ * 鉴权决策：与既有业务 API（/api/knowledge/search 等）保持一致，采用
+ * rateLimiter + verifyRequestSecurity（x-proxy-key 静态密钥或 HMAC-SHA256 签名双模式）。
+ * 配置虽为非敏感只读数据，仍纳入统一鉴权以避免未授权抓取并与端侧既有请求头约定对齐。
+ */
+app.get('/api/v1/config/app-config', rateLimiter(60), verifyRequestSecurity, (_req: Request, res: Response) => {
+  res.json({ ...loadAppConfig(), generatedAt: new Date().toISOString() })
+})
+
+// ============ T6b 知识库只读端点 ============
+
+/**
+ * GET /api/v1/knowledge/bus-schedule —— 校车时刻表（源：knowledge/data/bus_schedule.json）。
+ * 响应字段与鸿蒙端 BusScheduleModel.ets 的 BusItem 接口对齐（映射逻辑见 knowledge/api.ts），
+ * 附 generatedAt。鉴权策略与 app-config 相同（rateLimiter(60) + verifyRequestSecurity）。
+ */
+app.get('/api/v1/knowledge/bus-schedule', rateLimiter(60), verifyRequestSecurity, (_req: Request, res: Response) => {
+  res.json(buildBusSchedulePayload())
+})
+
+/**
+ * GET /api/v1/knowledge/guides —— 校园指南聚合（学术政策/场馆/校医院/校园生活）。
+ * 可选查询参数 category（如 academic_policy/facilities/hospital/campus_life/all）与 keyword，
+ * 过滤语义对齐前端 ToolExecutor.queryCampusGuide；输出条目为 GuideItem 形态，附 generatedAt。
+ */
+app.get('/api/v1/knowledge/guides', rateLimiter(60), verifyRequestSecurity, (req: Request, res: Response) => {
+  const category = req.query.category ? String(req.query.category) : 'all'
+  const keyword = req.query.keyword ? String(req.query.keyword) : ''
+  res.json(buildGuidesPayload(category, keyword))
 })
 
 /**
