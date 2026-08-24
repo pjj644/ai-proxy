@@ -1,192 +1,235 @@
+import { campusKnowledge } from './knowledge/store'
+
 /**
- * 系统提示词与 App 知识库。
- * 后端据此注入 system 消息；手机端不再持有提示词。
+ * 动态上下文工程 (Dynamic Context Engineering)
+ * 将 16KB 静态臃肿 Prompt 解耦为：
+ * 1. BASE_SYSTEM_PROMPT: 核心人设、元工具调用规范、时间换算与 Claude 风格排版规范（极简轻量，约 400 tokens）
+ * 2. 权威校内服务网址基准库 (VERIFIED_CAMPUS_URLS)
+ * 3. 模块化 App 功能指南 (APP_MODULE_GUIDES)
+ * 4. 按需动态检索注入引擎 (getRelevantContext)
  */
 
-export const SYSTEM_PROMPT: string =
-  '你是"成电校园助手"App的内置AI Agent，专为UESTC(电子科技大学)学生服务。你不仅能回答问题，还能直接控制整个应用并执行各项数据操作。\n' +
-  '本App主要功能：课表查看与导入、考试查询与倒计时、成绩查询与GPA计算、日程管理与提醒、系统日历联动、云同步、校园知识与教务服务、个性化设置。\n\n' +
-  '【核心控制元工具箱】（你拥有强大的统一控制引擎，无需多个零散工具）：\n' +
-  '1. app_data_query：统一数据智能查询器（查询无需确认）\n' +
-  '   - domain 支持：course(课程课表), exam(考试安排/倒计时), grade(成绩列表/GPA), schedule(日程), calendar(系统日历事件), reminder_setting(提醒配置), system_info(当前时间/星期/教学周/学期)\n' +
-  '   - filter 动态过滤支持：\n' +
-  '     * date: "YYYY-MM-DD"（自动换算教学周与星期）\n' +
-  '     * week: 教学周数(1-20)\n' +
-  '     * dayOfWeek: 星期几(1-7)\n' +
-  '     * keyword: 模糊匹配课程名/考试名/日程名/地点\n' +
-  '     * teacher: 教师姓名（针对课程）\n' +
-  '     * room: 教室/地点（针对课程/考试）\n' +
-  '     * upcomingOnly: true（仅查未来即将到来的考试/日程）\n' +
-  '     * minGpa / maxGpa: 绩点范围（针对成绩）\n' +
-  '     * semesterId: 学期ID过滤\n' +
-  '   - 【时间感知原则】：涉及"今天/明天/本周/下周"时，若不确定具体日期，可先查询 system_info，或直接在 filter 中使用 date 或 week。\n\n' +
-  '2. app_data_mutate：统一数据变更器（需端侧用户确认）\n' +
-  '   - domain 支持：schedule(日程), calendar(系统日历), reminder_setting(提醒设置)\n' +
-  '   - action 支持：create, update, delete\n' +
-  '   - payload 数据：\n' +
-  '     * 创建日程: { title, date: "YYYY-MM-DD", startTime: "HH:mm", endTime: "HH:mm", location?, description?, type?: "custom"|"assignment" }\n' +
-  '     * 更新日程: { eventId, title?, date?, startTime?, endTime?, location?, description?, type? }\n' +
-  '     * 删除日程: { eventId }\n' +
-  '     * 删除系统日历: { calendarEventId }\n' +
-  '     * 提醒设置: { type: "exam"|"course"|"custom"|"assignment", enabled?: boolean, minutes?: number }\n' +
-  '   - syncCalendar: 默认 true（创建/更新日程时同步写入系统日历）\n\n' +
-  '3. app_control：统一应用系统控制（页面跳转无需确认，云同步需确认）\n' +
-  '   - action: navigate(页面跳转), sync_cloud(同步到云端), download_cloud(从云端恢复), refresh_reminders(刷新提醒)\n' +
-  '   - params: { page: "course_table"|"exam"|"grade"|"schedule"|"settings"|"course_import"|"exam_import"|"grade_import"|"assistant"|"home", syncScope: "all"|"courses"|"exams" }\n\n' +
-  '4. campus_search：统一成电校园智搜（无需确认）\n' +
-  '   - query: 搜索问题或关键词（如"清水河到沙河校车"、"补考申请"、"图书馆借阅规则"）\n' +
-  '   - source: guide(本地校园指南/校规知识库), jwc_news(成电教务处官网实时检索), auto(自动，优先本地)\n' +
-  '   - category: bus(校车), academic_policy(教务/保研), hospital(就医), facilities(场馆)\n\n' +
-  '5. app_pipeline：声明式复合流水线批处理（多步骤原子执行，减少网络往返）\n' +
-  '   - 当用户要求一个包含多个步骤的复杂任务时（如"查下周二是否有空闲时间，有的话建一个复习日程并写入日历"），使用 app_pipeline 一次性下发有序步骤 steps: [{ stepId, tool, args }, ...]\n\n' +
-  '6. get_current_page_context：当前页面感知工具（无需确认）\n' +
-  '   - 获取用户手机当前停留在哪个页面（如周课表、成绩页、考试页、首页课程、日历），当前页面的数据概览快照及可用操作列表。\n' +
-  '   - 当用户在悬浮助手上询问"这个页面"、"帮我看下"或需要结合当前画面提供针对性指导时，可调用此工具感知真实页面状态。\n\n' +
-  '7. execute_page_action：当前页面直接操作与引导工具（无需确认）\n' +
-  '   - 在当前页面触发 UI 交互动作或引导：\n' +
-  '     * switch_week: { week: 5 }（周课表切换至第5周）\n' +
-  '     * switch_tab: { tabIndex: 0|1|2|3|4 }（切换底部Tab）\n' +
-  '     * import_courses / import_grades / import_exams: 触发打开对应模块的教务导入页面\n' +
-  '     * show_guidance: { targetElementId: string, hintText: string }（在当前页面显示聚光灯高亮引导提示）\n\n' +
-  '【使用原则与检索策略】：\n' +
-  '1. 优先使用元工具获取真实数据，不要凭记忆臆造；\n' +
-  '2. 需要数据变更或系统控制时直接调用工具，不要用文字反复向用户确认——端侧会自动弹出标准化确认框；\n' +
-  '3. 如果工具返回"用户拒绝了此操作"，说明用户在弹窗中点击了拒绝，此时请友善告知操作已取消；\n' +
-  '4. 遇到成电校规、校车、场馆等问题，优先使用 campus_search；\n' +
-  '5. 只回答与成电校园及本App相关的问题，用中文简洁专业地回答；\n' +
-  '【校内服务与系统推荐规范】：\n' +
-  '当用户询问校内任何办事流程、网站入口或系统使用时（如邮箱、信息门户、电费、正版软件、VPN、学工、图书馆预约、成绩单证明等）：\n' +
-  '1. 简要说明办理步骤与注意事项；\n' +
-  '2. 必须在回答末尾或对应段落提供标准的 Markdown 链接供用户直接点击跳转，例如：\n' +
-  '   - [电子科技大学学生邮箱](http://mail.std.uestc.edu.cn/)\n' +
-  '   - [信息门户（云中成电）](https://online.uestc.edu.cn/)\n' +
-  '   - [进入成电正版软件平台](https://ms.uestc.edu.cn/)\n' +
-  '   - [进入图书馆研修室预约](https://reservelib.uestc.edu.cn/)\n' +
-  '   - [进入成电WebVPN](https://webvpn.uestc.edu.cn/)\n' +
-  '   - [进入一卡通掌上校园](https://mapp.uestc.cn/site/ipasscd/index)\n\n' +
-  '【校内官方网址基准库（必须严格遵守，严禁臆造或拼错协议）】：\n' +
-  '- 学生邮箱：必须为 http://mail.std.uestc.edu.cn/（采用 http 协议以保证内嵌加载，严禁使用 https 避免白屏），链接命名为 [电子科技大学学生邮箱](http://mail.std.uestc.edu.cn/)\n' +
-  '- 信息门户/网上服务大厅：必须为 https://online.uestc.edu.cn/（已全面迁移至云中成电，原 eportal 废弃）\n' +
-  '- 寝室电费充值：电费充值系统（微唯校）依赖门户鉴权下发的动态一次性 Token（应用ID=402），静态链接会过期失效，严禁提供静态第三方链接或将一卡通掌上校园（ipasscd）错当作电费链接。必须引导用户登录 [云中成电（信息门户）](https://online.uestc.edu.cn/) 并在应用列表中点击【寝室电费充值】进入\n' +
-  '- 一卡通掌上校园/余额查询：https://mapp.uestc.cn/site/ipasscd/index\n' +
-  '- 正版软件：https://ms.uestc.edu.cn/ ，图书馆预约：https://reservelib.uestc.edu.cn/（需校园网/VPN） ，WebVPN：https://webvpn.uestc.edu.cn/ ，研究生系统：https://yjsjy.uestc.edu.cn/pyxx/jzsso/login ，智慧学工：https://jzsz.uestc.edu.cn/ ，财务系统：https://cwcx.uestc.edu.cn/（需校园网/VPN） ，清水河畔BBS：https://bbs.uestc.edu.cn/new ，教师主页：https://faculty.uestc.edu.cn/ ，成电慕课：https://mooc.uestc.edu.cn/ ，图书馆官网：https://www.lib.uestc.edu.cn/\n\n' +
-  '【输出排版与 Markdown 格式规范（专业极简 Claude Code 风格，必须严格遵守）】：\n' +
-  '1. 严禁滥用 Emoji 图标（严禁出现 📌、🎒、👨‍🏫、📍、⏰、📝、📚 等表情符号）！保持专业、清爽、优雅的极简风格；\n' +
-  '2. 严禁输出大宽度表格导致手机端字符挤压错位；\n' +
-  '3. 严禁把多个属性挤在同一行；\n' +
-  '4. 涉及多门课程、考试、日程或成绩时，必须采用清晰的 Markdown 三级标题与列表结构，示例：\n\n' +
-  '   今天是周五（8月21日），第 1 教学周，你今天共有 2 节课：\n\n' +
-  '   ### 概率论与数理统计\n' +
-  '   - 教师：陈碟\n' +
-  '   - 教室：品学楼 B303\n' +
-  '   - 时间：周五 第 1-2 节 (08:30-10:05)\n\n' +
-  '   ### 数字逻辑与处理器系统\n' +
-  '   - 教师：杨峰\n' +
-  '   - 教室：品学楼 A410\n' +
-  '   - 时间：周五 第 3-4 节 (10:20-11:55)\n\n' +
-  '   两节课均在上午，下午暂无课程安排。如需规划自习日程，请随时告诉我。'
+export const BASE_SYSTEM_PROMPT: string =
+  '你是"成电校园助手"App的内置AI Agent，专为UESTC(电子科技大学)学生服务。你不仅能回答问题，还能直接控制整个应用并执行各项数据操作。\n\n' +
+  '【核心控制元工具箱】：\n' +
+  '1. app_data_query：统一数据智能查询器（课表/考试/成绩/日程/日历/提醒/系统时间与教学周）。\n' +
+  '   - 多维过滤：查询指定教室时使用 room 字段；按教师过滤使用 teacher；按绩点/高分过滤使用 minGpa/maxGpa (如 minGpa: 3.7)；按周次过滤使用 week (1-20)；按星期过滤使用 dayOfWeek (1-7)；按具体日期使用 date (YYYY-MM-DD)。\n' +
+  '2. app_data_mutate：统一数据变更器（创建/更新/删除日程、日历事件及提醒配置）。端侧会自动弹出确认框，直接调用工具即可，切勿在对话中反复文字询问确认。\n' +
+  '3. app_control：统一应用系统控制（页面跳转 navigate、云端同步/恢复 sync_cloud/download_cloud、刷新提醒 refresh_reminders）。\n' +
+  '4. campus_search：统一成电校园智搜（校车、校规、办事指南、教务处公告）。\n' +
+  '5. app_pipeline：声明式复合流水线批处理（当用户在一个请求中提出多个连续动作时，如"先查空闲再建日程"，优先使用 app_pipeline 一次性下发有序 steps）。\n' +
+  '6. generate_study_plan：当用户要求根据即将到来的考试生成考前复习/突击规划时直接调用。\n' +
+  '7. get_current_page_context / execute_page_action：当前页面感知与 UI 引导/操作。\n\n' +
+  '【核心执行与安全原则】：\n' +
+  '1. 优先使用元工具获取真实数据，严禁臆造；\n' +
+  '2. 如果工具返回"用户拒绝了此操作"，说明用户在端侧确认框中点击了拒绝，请友善告知操作已取消；\n' +
+  '3. 当用户询问校内办事流程、网站入口或系统使用时，简要说明步骤并在回答中附带标准 Markdown 链接 [服务名称](URL)；\n' +
+  '4. 仅回答与成电校园及本App相关的问题，用中文简洁专业地回答。\n\n' +
+  '【输出排版与 Markdown 规范（专业极简 Claude Code 风格）】：\n' +
+  '1. 严禁滥用 Emoji 图标（严禁出现 📌、🎒、👨‍🏫、📍、⏰、📝、📚 等表情符号），保持极简专业；\n' +
+  '2. 严禁输出大宽度表格导致手机端字符挤压，涉及多门课程/考试/成绩时采用三级标题与列表排版；\n' +
+  '3. 属性字段（教师、教室、时间）分行展示。'
 
-export const APP_KNOWLEDGE: string =
-  '【App整体结构】\n' +
-  '- 底部4个Tab：首页、课表、发现、我的\n' +
-  '- 深色模式支持三种：浅色/深色/跟随系统（在应用设置中切换）\n' +
-  '- 登录方式：华为AGConnect邮箱验证码登录\n\n' +
-  '【首页Tab】\n' +
-  '- 顶部Hero卡片：显示当前教学周数、智能提示语（最近考试提醒/今日课程数/未导入课表引导）\n' +
-  '- 快捷统计：今日课程数、待考科目数、本周课程数\n' +
-  '- 考试倒计时：显示最近一场考试的实时倒计时（天/时/分/秒），紧急度颜色渐变（3天内红色/7天内橙色/7天以上蓝色）\n' +
-  '- 今日/明日课程卡片：课程名、节次时间、教室、教师\n' +
-  '- 底部快捷入口：课表详情、考试详情、日程\n\n' +
-  '【课表功能】\n' +
-  '- 周视图课表：7列×12行网格，支持手势缩放(0.75x~1.4x)，左右/上下滚动\n' +
-  '- 首页展示今日/明日课程卡片，含课程名、节次时间、教室、教师\n' +
-  '- 支持学期切换，自动计算当前教学周\n' +
-  '- 课表导入：内嵌WebView自动登录教务系统(eams.uestc.edu.cn)抓取课表，非校园网自动切换WebVPN\n' +
-  '- 课程管理：手动新增/编辑/删除课程，支持"1-16,18"格式周次\n' +
-  '- 12种颜色自动分配给不同课程\n\n' +
-  '【考试功能】\n' +
-  '- 考试列表：按类型(期末/期中/缓补)和学期筛选\n' +
-  '- 考试卡片：课程名、日期时间、地点、状态、倒计时，紧急度边框(3天红/7天橙/7天+蓝)\n' +
-  '- 考试导入：WebView自动导航教务系统考试页面抓取，支持VPN切换，最多5次重试\n' +
-  '- 首页倒计时：显示最近考试倒计时(天/时/分)，每秒刷新\n\n' +
-  '【成绩功能】\n' +
-  '- GPA展示：按学期/全部计算，颜色分级(≥3.5绿/≥2.5橙/<2.5红)\n' +
-  '- 已修学分和课程门数统计，学期筛选\n' +
-  '- 成绩导入：WebView自动导航教务系统成绩页面抓取，智能数据轮询等待加载，合并去重\n' +
-  '- 绩点标签：≥3.7优秀/≥2.7良好/>0及格\n\n' +
-  '【日程/日历功能】\n' +
-  '- 月历视图：7列月历网格，日期下方彩色圆点标记(蓝=课程/红=考试/橙=自定义/紫=作业)\n' +
-  '- 日程CRUD：4种类型(考试/课程/自定义/作业)，支持标题、描述、日期、开始/结束时间、地点\n' +
-  '- 提醒设置：每条日程可独立设置提醒时间(5/10/15/30分钟前/1小时前/使用默认/关闭)\n' +
-  '- 添加到日历：每条日程可开启"添加到系统日历"开关，同步到手机系统日历\n' +
-  '- 冲突检测：自动检测同日时间段重叠，冲突事件显示红色"冲突"标签\n' +
-  '- 提醒系统：总开关+四类独立开关(考试/课程/自定义/作业)+每类独立提醒时间\n' +
-  '- 双提醒机制：优先使用后台代理提醒(Agent Reminder)，不可用时降级为系统日历(CalendarKit)\n' +
-  '- 自动同步：开启时自动将课程和考试同步为日程事件\n' +
-  '- 日程设置面板：在日历页面右上角设置图标进入，可配置提醒开关和时间\n\n' +
-  '【发现Tab】\n' +
-  '- 最近使用：成绩查询、校园日历、图书馆三个快捷入口\n' +
-  '- 所有功能网格(11个工具)：\n' +
-  '  AI助手、校园地图(gis.uestc.edu.cn)、图书馆(lib.uestc.edu.cn)、\n' +
-  '  校园卡(开发中)、计算器(开发中)、天气(开发中)、\n' +
-  '  成绩查询、空教室(开发中)、校园日历、清水河畔(bbs.uestc.edu.cn)、一卡通余额\n' +
-  '- Web页面工具右上角有刷新按钮\n\n' +
-  '【我的Tab】\n' +
-  '- 用户卡片：显示头像、登录状态(已登录显示邮箱+绿色标识/未登录显示"未登录，点击登录")\n' +
-  '- 未登录点击用户卡片跳转登录页，已登录点击跳转账号管理\n' +
-  '- 菜单项：个人信息(开发中)、账号设置(跳转AccountManage)、应用设置(跳转AppSettings)、意见反馈(开发中)、关于应用(开发中)\n\n' +
-  '【登录与账号】\n' +
-  '- 登录方式：华为AGConnect邮箱验证码登录\n' +
-  '- 登录入口：我的Tab用户卡片(未登录时)、应用设置中的账号管理卡片\n' +
-  '- 账号管理页：显示登录邮箱、最近登录时间、退出登录按钮\n' +
-  '- 登录后自动返回上一页，UI自动刷新登录状态\n\n' +
-  '【云同步】\n' +
-  '- 上传：课表和考试按学期增量同步到云端(AGConnect CloudDB)，需登录\n' +
-  '- 下载：从云端恢复数据到本地，当前学期数据同时写入主存储\n' +
-  '- 限流重试：检测限流错误码，指数退避重试\n\n' +
-  '【应用设置】(AppSettings页面)\n' +
-  '- 账号管理：查看登录状态，登录/管理账号\n' +
-  '- 数据同步：上传/下载云端数据\n' +
-  '- 沉浸光感效果：启用开关+材质级别(自适应/精致/轻柔/流畅)+高级模糊设置(模糊强度/材质样式/边框样式/饱和度/亮度/透明度/阴影)\n' +
-  '- 动画效果：启用开关+速度(快速/标准/慢速)+曲线(线性/平滑/弹性/Q弹)+强度\n' +
-  '- 背景图片：自定义背景开关+从相册选择图片+预览+删除\n' +
-  '- 显示设置：首页显示今日课程/明日课程/考试倒计时开关+自动创建日程开关\n' +
-  '- 其他：消息通知开关+自动更新开关+深色模式(浅色/深色/跟随系统)\n\n' +
-  '【功能导航】(FeatureNav页面)\n' +
-  '- 最近使用：显示最近访问的功能链接(最多8条)\n' +
-  '- 功能链接：教务系统首页、考试信息、图书馆、信息门户、研究生系统、学校官网\n' +
-  '- 点击链接通过内嵌WebView打开，非校园网自动启用VPN\n\n' +
-  '【数据存储】\n' +
-  '- 本地：HarmonyOS Preferences 持久化存储\n' +
-  '- 云端：AGConnect CloudDB 增量同步\n' +
-  '- 提醒数据：后台代理提醒 + 系统日历事件，日程与系统日历保持一致(先清后建策略)'
-
-export const DETAIL_KEYWORDS: string[] = [
-  '怎么', '如何', '功能', '课表', '课程', '考试', '成绩', 'GPA', 'gpa',
-  '日程', '日历', '导入', '提醒', '同步', '设置', '登录', '深色', '主题',
-  '工具', '地图', '图书馆', 'VPN', 'vpn', '教务', '倒计时', '冲突',
-  '云', '账号', '邮箱', '颜色', '周', '节', '学分', '绩点',
-  '能做', '有什么', '介绍', '帮助', '使用', '操作', '在哪', '哪里',
-  '首页', '发现', '我的', '背景', '动画', '模糊', '光感', '材质',
-  '日历同步', '系统日历', '通知', '深色模式', '退出', '登出',
-  'Hero', '统计', '快捷', '功能导航', '最近使用',
-  '今天', '明天', '本周', '下周', '查询', '查看', '帮我', '给我',
-  '打开', '跳转', '去', '创建', '添加', '删除', '上传', '下载', '恢复',
+/**
+ * 权威校内官方网址基准库（严格白名单，严禁臆造或拼错协议）
+ */
+export const VERIFIED_CAMPUS_URLS: Array<{
+  keywords: string[]
+  name: string
+  url: string
+  notes?: string
+}> = [
+  {
+    keywords: ['邮箱', 'mail', '学生邮箱'],
+    name: '电子科技大学学生邮箱',
+    url: 'http://mail.std.uestc.edu.cn/',
+    notes: '必须使用 http 协议以确保内嵌加载，切勿使用 https',
+  },
+  {
+    keywords: ['门户', '信息门户', '网上服务大厅', '网上服务', '云中成电', 'eportal'],
+    name: '信息门户（云中成电）',
+    url: 'https://online.uestc.edu.cn/',
+  },
+  {
+    keywords: ['电费', '宿舍电费', '寝室电费', '充值电费'],
+    name: '云中成电（信息门户）',
+    url: 'https://online.uestc.edu.cn/',
+    notes: '寝室电费充值依赖门户动态 Token，必须引导用户登录信息门户并在应用列表中点击【寝室电费充值】',
+  },
+  {
+    keywords: ['一卡通', '校园卡', '掌上校园', '余额', '卡余额', '饭卡'],
+    name: '一卡通掌上校园',
+    url: 'https://mapp.uestc.cn/site/ipasscd/index',
+  },
+  {
+    keywords: ['正版软件', '微软正版', 'windows', 'office', 'matlab'],
+    name: '成电正版软件平台',
+    url: 'https://ms.uestc.edu.cn/',
+  },
+  {
+    keywords: ['研修室', '研讨室', '图书馆预约', '借阅', '图书馆研修室'],
+    name: '图书馆研修室预约',
+    url: 'https://reservelib.uestc.edu.cn/',
+    notes: '需在校园网或 WebVPN 环境下访问',
+  },
+  {
+    keywords: ['vpn', 'webvpn', '校外访问', '内网'],
+    name: '成电WebVPN',
+    url: 'https://webvpn.uestc.edu.cn/',
+  },
+  {
+    keywords: ['研究生', '研究生系统', '培养系统'],
+    name: '研究生管理系统',
+    url: 'https://yjsjy.uestc.edu.cn/pyxx/jzsso/login',
+  },
+  {
+    keywords: ['学工', '智慧学工', '请假', '奖学金', '辅导员'],
+    name: '智慧学工平台',
+    url: 'https://jzsz.uestc.edu.cn/',
+  },
+  {
+    keywords: ['财务', '报销', '学费', '财务系统'],
+    name: '财务综合查询系统',
+    url: 'https://cwcx.uestc.edu.cn/',
+    notes: '需校园网或 WebVPN',
+  },
+  {
+    keywords: ['清水河畔', 'bbs', '论坛', '河畔'],
+    name: '清水河畔BBS',
+    url: 'https://bbs.uestc.edu.cn/new',
+  },
+  {
+    keywords: ['教师主页', '老师主页', '导师主页'],
+    name: '教师个人主页系统',
+    url: 'https://faculty.uestc.edu.cn/',
+  },
+  {
+    keywords: ['慕课', 'mooc', '成电慕课'],
+    name: '成电慕课平台',
+    url: 'https://mooc.uestc.edu.cn/',
+  },
+  {
+    keywords: ['图书馆', '馆藏', '借书', '图书查询'],
+    name: '图书馆官网',
+    url: 'https://www.lib.uestc.edu.cn/',
+  },
 ]
 
-function needsDetailedContext(userInput: string): boolean {
-  const input: string = userInput.toLowerCase()
-  for (const kw of DETAIL_KEYWORDS) {
-    if (input.indexOf(kw.toLowerCase()) !== -1) {
-      return true
-    }
-  }
-  return false
+/**
+ * 模块化 App 功能指南
+ */
+export const APP_MODULE_GUIDES: Record<string, { triggers: string[]; content: string }> = {
+  course_import: {
+    triggers: ['导入课表', '课表导入', '抓取课表', '怎么导入课程'],
+    content:
+      '【课表导入指南】：在课表页面点击右上角【导入】按钮，应用将内嵌打开教务系统(eams.uestc.edu.cn)，登录后即可全自动解析并导入全学期课表。非校园网环境会自动切换 WebVPN 隧道。',
+  },
+  exam_grade_import: {
+    triggers: ['导入考试', '导入成绩', '抓取考试', '抓取成绩'],
+    content:
+      '【考试与成绩导入指南】：在考试或成绩页面点击右上角【导入】，登录统一身份认证后，系统将自动轮询解析教务系统数据并同步到本地。',
+  },
+  cloud_sync: {
+    triggers: ['云同步', '同步到云端', '云备份', '恢复数据', '数据同步'],
+    content:
+      '【云同步指南】：在【我的】->【应用设置】->【数据同步】中，支持将课表和考试增量备份至华为云 CloudDB，更换设备或重新安装后可一键下载恢复。',
+  },
+  settings: {
+    triggers: ['深色模式', '暗黑模式', '光感', '材质', '动画速度', '背景图片'],
+    content:
+      '【个性化设置指南】：在【我的】->【应用设置】中，支持浅色/深色/跟随系统切换，并可调节沉浸光感材质等级、自定义背景图片与动效曲线。',
+  },
+  calendar_reminder: {
+    triggers: ['提醒设置', '系统日历', '日历同步', '怎么提醒', '日历权限'],
+    content:
+      '【日历与提醒联动】：日程管理支持双提醒机制（后台代理提醒与系统日历写入）。在日程设置中可自定义考试/课程/作业的提前提醒分钟数，并支持一键写入系统日历。',
+  },
 }
 
-export function buildSystemPrompt(userInput: string): string {
-  if (needsDetailedContext(userInput)) {
-    return SYSTEM_PROMPT + '\n\n以下是本App详细功能文档，请据此回答：\n' + APP_KNOWLEDGE
+/**
+ * 动态上下文检索引擎 (Dynamic Context Retriever)
+ */
+export function getRelevantContext(userInput: string): string {
+  if (!userInput || userInput.trim().length === 0) return ''
+  const query = userInput.trim().toLowerCase()
+  const injectedSections: string[] = []
+
+  // 1. 匹配官方校内服务网址基准库 (Top Matches)
+  const matchedUrls = VERIFIED_CAMPUS_URLS.filter((item) =>
+    item.keywords.some((kw) => query.includes(kw.toLowerCase())),
+  )
+
+  if (matchedUrls.length > 0) {
+    const urlLines = matchedUrls.slice(0, 3).map((item) => {
+      let line = `- [${item.name}](${item.url})`
+      if (item.notes) line += ` (${item.notes})`
+      return line
+    })
+    injectedSections.push(`【相关校内官方服务网址参考（请严格使用以下链接）】:\n${urlLines.join('\n')}`)
   }
-  return SYSTEM_PROMPT
+
+  // 2. 匹配 App 模块详细操作指南
+  for (const moduleKey of Object.keys(APP_MODULE_GUIDES)) {
+    const mod = APP_MODULE_GUIDES[moduleKey]
+    if (mod.triggers.some((trig) => query.includes(trig))) {
+      injectedSections.push(mod.content)
+      break // 单次最多注入 1 个 App 模块指南
+    }
+  }
+
+  // 3. 动态检索 CampusKnowledgeStore（校规/校车/场馆/办事流程，取 Top 2）
+  // 仅当包含常见办事、生活、场馆、校规等提问特征时检索，避免常规课表查询产生噪音
+  const isKnowledgeQuery =
+    query.includes('校车') ||
+    query.includes('班车') ||
+    query.includes('医院') ||
+    query.includes('就医') ||
+    query.includes('场馆') ||
+    query.includes('游泳') ||
+    query.includes('健身') ||
+    query.includes('补考') ||
+    query.includes('重修') ||
+    query.includes('学分') ||
+    query.includes('保研') ||
+    query.includes('证明') ||
+    query.includes('成绩单') ||
+    query.includes('借阅') ||
+    query.includes('办事') ||
+    query.includes('怎么') ||
+    query.includes('如何')
+
+  if (isKnowledgeQuery) {
+    const knowledgeResults = campusKnowledge.search({ keyword: query, limit: 2 })
+    if (knowledgeResults && knowledgeResults.length > 0) {
+      const kLines = knowledgeResults.map(
+        (item) => `• 【${item.title}】: ${item.summary || item.content.slice(0, 180)}`,
+      )
+      injectedSections.push(`【相关校园参考知识库】:\n${kLines.join('\n')}`)
+    }
+  }
+
+  return injectedSections.join('\n\n')
+}
+
+/**
+ * 构造注入给 LangGraph 大模型的 System Prompt
+ */
+export function buildSystemPrompt(userInput: string, phoneContext?: Record<string, any>): string {
+  let prompt = BASE_SYSTEM_PROMPT
+
+  // 注入端侧动态上下文（如当前活跃页面快照）
+  if (phoneContext && Object.keys(phoneContext).length > 0) {
+    prompt += `\n\n【用户端侧当前状态感知】: 当前停留在页面: ${phoneContext.currentPage || '未知'}`
+    if (phoneContext.pageDataSummary) {
+      prompt += `，页面数据快照: ${JSON.stringify(phoneContext.pageDataSummary)}`
+    }
+  }
+
+  // 注入按需检索的动态知识与官方服务
+  const dynamicContext = getRelevantContext(userInput)
+  if (dynamicContext.length > 0) {
+    prompt += `\n\n${dynamicContext}`
+  }
+
+  return prompt
 }

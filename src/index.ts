@@ -165,13 +165,15 @@ app.post('/api/chat', rateLimiter(30), verifyRequestSecurity, validatePayloadBou
     }
 
     // 4. 进入 LangGraph 调度循环
+    send({ type: 'status', status: 'thinking', message: '正在理解您的问题与上下文...' })
+
     const config = { configurable: { thread_id: sessionId }, recursionLimit: 25 }
     let input: any = { messages: [new HumanMessage(preprocess.enrichedMessage)] }
 
     while (true) {
       const stream = await graph.stream(input, { ...config, streamMode: ['messages'] })
       for await (const chunk of stream) {
-        let msgChunk: { _getType?: () => string; content?: unknown; response_metadata?: any; usage_metadata?: any } | undefined
+        let msgChunk: { _getType?: () => string; content?: unknown; response_metadata?: any; usage_metadata?: any; additional_kwargs?: any } | undefined
         if (Array.isArray(chunk)) {
           if (typeof chunk[0] === 'string') {
             const [mode, value] = chunk as [string, unknown]
@@ -185,6 +187,16 @@ app.post('/api/chat', rateLimiter(30), verifyRequestSecurity, validatePayloadBou
         }
 
         if (msgChunk && msgChunk._getType && msgChunk._getType() === 'ai') {
+          // 提取模型思维链（如 MiMo-2.5 / DeepSeek Reasoner 的 reasoning_content）
+          const reasoning =
+            (msgChunk as any)?.additional_kwargs?.reasoning_content ||
+            (msgChunk as any)?.response_metadata?.reasoning_content ||
+            (msgChunk as any)?.delta?.reasoning_content ||
+            ''
+          if (typeof reasoning === 'string' && reasoning.length > 0) {
+            send({ type: 'thought_chunk', content: reasoning })
+          }
+
           const rawText = typeof msgChunk.content === 'string' ? msgChunk.content : ''
           const text = scrubThoughtTags(rawText)
           if (text.length > 0) {
@@ -236,6 +248,7 @@ app.post('/api/chat', rateLimiter(30), verifyRequestSecurity, validatePayloadBou
         }
       })
 
+      send({ type: 'status', status: 'tool_calling', message: '正在调用相关应用服务...' })
       send({ type: 'tool_call', batch_id, tool_calls: toolCallsWithMeta })
       console.log(
         `[chat] session=${sessionId} batch=${batch_id} tools=${toolCalls.map((t) => t.name).join(',')} -> waiting phone`,
@@ -260,10 +273,11 @@ app.post('/api/chat', rateLimiter(30), verifyRequestSecurity, validatePayloadBou
         console.log(`[chat] session=${sessionId} batch=${batch_id} got ${results.length} results -> resume`)
         input = new Command({ resume: results })
       }
+      send({ type: 'status', status: 'thinking', message: '正在整合数据并生成回答...' })
+    }
 
-      if (clientClosed) {
-        console.log(`[chat] session=${sessionId} client closed, finishing graph silently`)
-      }
+    if (clientClosed) {
+      console.log(`[chat] session=${sessionId} client closed, finishing graph silently`)
     }
 
     // 发送 final 事件并透传遥测指标

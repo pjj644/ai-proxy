@@ -63,7 +63,7 @@ ${lastError || '无明确报错，但疑似陷入死循环或超限'}
 请对当前状态做出裁决并输出 JSON：`
 
   try {
-    const criticLLM: ChatOpenAI = createLLM()
+    const criticLLM = createLLM({ streaming: false })
     // 使用非流式调用
     const response = await criticLLM.invoke([
       new SystemMessage(criticSystemPrompt),

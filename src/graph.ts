@@ -1,7 +1,7 @@
 import { StateGraph, START, END, Annotation, interrupt } from '@langchain/langgraph'
 import { SqliteSaver } from '@langchain/langgraph-checkpoint-sqlite'
 import { AIMessage, SystemMessage, ToolMessage, BaseMessage } from '@langchain/core/messages'
-import { createLLM } from './llm'
+import { createLLMWithTools } from './llm'
 import { tools } from './tools'
 import { buildSystemPrompt } from './prompt'
 import { registry } from './registry'
@@ -11,8 +11,7 @@ import type { ToolResultInput, ToolCallReq } from './types'
 
 export type { ToolResultInput }
 
-const llm = createLLM()
-const llmWithTools = llm.bindTools(tools)
+const llmWithTools = createLLMWithTools(tools)
 
 /**
  * 状态图 Annotation 定义（支持迭代计数、循环哈希与连续错误追踪）

@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:eval": "tsx test/evals/runner.ts"
   },
   "dependencies": {
     "@langchain/core": "^1.2.5",
