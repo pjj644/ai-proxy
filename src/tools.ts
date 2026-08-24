@@ -71,7 +71,9 @@ export function getToolMeta(name: string, args?: Record<string, any>): ToolMeta 
   if (name === 'app_control' && args && args.action === 'navigate') {
     return { requiresConfirmation: false, riskLevel: 'low' }
   }
-  return toolMeta[name] || { requiresConfirmation: false, riskLevel: 'low' }
+  // 未收录工具名按最高风险处理（fail-closed）：与端侧 ToolRegistry 哨兵口径一致，
+  // 防止模型幻觉出的工具名经 meta 缺失路径绕过确认弹窗
+  return toolMeta[name] || { requiresConfirmation: true, riskLevel: 'high' }
 }
 
 export const tools: StructuredTool[] = [
