@@ -82,6 +82,23 @@ function mockDeviceExecution(toolName: string, args: any): string {
     return JSON.stringify({ success: true, executedSteps: args?.steps?.length || 1, message: '流水线全部执行完成' })
   }
 
+  if (toolName === 'generate_study_plan') {
+    // 对齐端侧 ToolExecutor.generateStudyPlan 的 StudyPlanResultData 返回契约
+    const dailyHours = typeof args?.dailyHours === 'number' ? args.dailyHours : 4
+    return JSON.stringify({
+      success: true,
+      totalExams: 2,
+      dailyHours,
+      focusCourse: args?.focusCourse || '',
+      strategy: '按考试紧急程度与倒计时天数加权分配，最近科目优先突破，每天合理规划时间。',
+      upcomingExams: [
+        { courseName: '概率论与数理统计', date: '2026-09-01', time: '09:00-11:00', daysLeft: 8, recommendedDailyHours: Math.round(dailyHours * 0.625 * 10) / 10 },
+        { courseName: '数据结构', date: '2026-09-04', time: '14:00-16:00', daysLeft: 11, recommendedDailyHours: Math.round(dailyHours * 0.375 * 10) / 10 },
+      ],
+      message: '复习计划已生成',
+    })
+  }
+
   if (toolName === 'get_current_page_context') {
     return JSON.stringify({ currentPage: 'course_table', currentWeek: 1, availableActions: ['switch_week', 'show_guidance'] })
   }
