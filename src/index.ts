@@ -8,7 +8,7 @@ import { Command } from '@langchain/langgraph'
 import { graph, ToolResultInput } from './graph'
 import { getToolMeta } from './tools'
 import { registry } from './registry'
-import { parseScheduleFromImage } from './vision'
+import { parseScheduleFromImage, parseVisionFromImage, VisionMode } from './vision'
 import { campusKnowledge } from './knowledge/store'
 import { buildBusSchedulePayload, buildGuidesPayload } from './knowledge/api'
 import { searchJwcWebsite } from './jwcScraper'
@@ -381,13 +381,14 @@ app.post('/api/tool-result', rateLimiter(60), verifyRequestSecurity, (req: Reque
 })
 
 app.post('/api/vision/parse-schedule', rateLimiter(10), verifyRequestSecurity, async (req: Request, res: Response) => {
-  const { image, hint } = req.body || {}
+  const { image, hint, mode } = req.body || {}
   if (!image) {
     res.status(400).json({ error: 'image base64 is required' })
     return
   }
   try {
-    const result = await parseScheduleFromImage(String(image), hint ? String(hint) : undefined)
+    const visionMode: VisionMode = (mode === 'course_table' || mode === 'grade_report') ? mode : 'schedule'
+    const result = await parseVisionFromImage(String(image), visionMode, hint ? String(hint) : undefined)
     res.json({ ok: true, data: result })
   } catch (error: unknown) {
     console.error('[vision/parse-schedule] error:', error)
