@@ -183,6 +183,15 @@ export const EVAL_DATASET: TestCase[] = [
     expectedTool: 'app_pipeline',
     description: '复合任务，期望下发 app_pipeline 批处理步骤',
   },
+  {
+    id: 'M06_SET_REMINDER_OFF',
+    category: 'DATA_MUTATE_PIPELINE',
+    userQuery: '帮我把课程提醒关掉',
+    expectedTool: 'app_data_mutate',
+    expectedDomain: 'reminder_setting',
+    expectedArgsPartial: { payload: { type: 'course', enabled: false } },
+    description: '关闭课程提醒配置',
+  },
 
   // ==========================================
   // 4. CAMPUS_SERVICE_URLS（校园权威服务与网址防幻觉）
