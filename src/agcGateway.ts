@@ -190,69 +190,6 @@ class AgcCloudDbGateway {
     this.saveStore()
     return exams.length
   }
-
-  // ============ 华为 AGC 邮箱验证码管理 ============
-
-  private verifyCodeStore = new Map<string, { code: string; expireAt: number }>()
-
-  /**
-   * 向指定邮箱发送 AGC 登录验证码
-   */
-  async sendVerifyCode(email: string): Promise<{ success: boolean; message: string; debugCode?: string }> {
-    if (!email || !email.includes('@')) {
-      return { success: false, message: '请输入有效的邮箱地址' }
-    }
-
-    // 生成 6 位随机验证码
-    const code = Math.floor(100000 + Math.random() * 900000).toString()
-    const expireAt = Date.now() + 5 * 60 * 1000 // 5分钟有效
-
-    this.verifyCodeStore.set(email.toLowerCase().trim(), { code, expireAt })
-    console.info(`[AgcCloudDbGateway] 华为 AGC 验证码已生成 [${email}]: ${code}`)
-
-    return {
-      success: true,
-      message: `验证码已发送至 ${email}，请在 5 分钟内完成校验`,
-      debugCode: code
-    }
-  }
-
-  /**
-   * 校验验证码并登录
-   */
-  async loginWithVerifyCode(email: string, inputCode: string): Promise<{ success: boolean; message: string; user?: any }> {
-    const cleanEmail = email.toLowerCase().trim()
-    const record = this.verifyCodeStore.get(cleanEmail)
-
-    if (!record) {
-      return { success: false, message: '请先获取验证码' }
-    }
-
-    if (Date.now() > record.expireAt) {
-      this.verifyCodeStore.delete(cleanEmail)
-      return { success: false, message: '验证码已过期，请重新获取' }
-    }
-
-    if (record.code !== inputCode.trim()) {
-      return { success: false, message: '验证码不正确，请重新输入' }
-    }
-
-    // 校验成功，清除验证码并返回用户会话
-    this.verifyCodeStore.delete(cleanEmail)
-    const user = {
-      uid: cleanEmail,
-      email: cleanEmail,
-      displayName: cleanEmail.split('@')[0],
-      isAnonymous: false,
-      lastLoginTime: Date.now()
-    }
-
-    return {
-      success: true,
-      message: '华为 AGC 账号登录验证成功',
-      user
-    }
-  }
 }
 
 export const agcCloudDbGateway = new AgcCloudDbGateway()

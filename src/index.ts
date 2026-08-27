@@ -609,40 +609,6 @@ app.post('/api/v1/agc/upsert-exams', rateLimiter(30), verifyRequestSecurity, asy
   }
 })
 
-/**
- * POST /api/v1/agc/send-code —— 向邮箱发送 AGC 登录验证码
- */
-app.post('/api/v1/agc/send-code', rateLimiter(10), verifyRequestSecurity, async (req: Request, res: Response) => {
-  const { email } = req.body || {}
-  if (!email) {
-    res.status(400).json({ success: false, message: '邮箱地址不能为空' })
-    return
-  }
-  try {
-    const result = await agcCloudDbGateway.sendVerifyCode(String(email))
-    res.json(result)
-  } catch (err: unknown) {
-    res.status(500).json({ success: false, message: String((err as Error)?.message || err) })
-  }
-})
-
-/**
- * POST /api/v1/agc/login-with-code —— 校验验证码并登录
- */
-app.post('/api/v1/agc/login-with-code', rateLimiter(10), verifyRequestSecurity, async (req: Request, res: Response) => {
-  const { email, code } = req.body || {}
-  if (!email || !code) {
-    res.status(400).json({ success: false, message: '邮箱与验证码均为必填项' })
-    return
-  }
-  try {
-    const result = await agcCloudDbGateway.loginWithVerifyCode(String(email), String(code))
-    res.json(result)
-  } catch (err: unknown) {
-    res.status(500).json({ success: false, message: String((err as Error)?.message || err) })
-  }
-})
-
 app.listen(PORT, () => {
   console.log(`[ai-agent] listening on port ${PORT}`)
 })
