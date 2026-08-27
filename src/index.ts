@@ -14,6 +14,7 @@ import { campusKnowledge } from './knowledge/store'
 import { buildBusSchedulePayload, buildGuidesPayload } from './knowledge/api'
 import { searchJwcWebsite } from './jwcScraper'
 import { JwcAuthProxy } from './jwcAuthProxy'
+import { agcCloudDbGateway } from './agcGateway'
 import { preprocessInput } from './preprocess'
 import { scrubThoughtTags, maskSensitiveInfo } from './postprocess'
 import type { ToolCallReq, ToolCallWithMeta, TurnTelemetry } from './types'
@@ -428,14 +429,17 @@ app.get('/api/jwc/search', rateLimiter(30), verifyRequestSecurity, async (req: R
  * 接收 { username, password }，内存中转后即弃，零本地存储。
  */
 app.post('/api/v1/jwc/sync-courses', rateLimiter(10), verifyRequestSecurity, async (req: Request, res: Response) => {
-  const { username, password } = req.body || {}
+  const { username, password, semesterId } = req.body || {}
   if (!username || !password) {
     res.status(400).json({ success: false, code: 'INVALID_CREDENTIALS', message: '学号和密码为必填项' })
     return
   }
 
   try {
-    const result = await JwcAuthProxy.fetchCourses({ username: String(username), password: String(password) })
+    const result = await JwcAuthProxy.fetchCourses(
+      { username: String(username), password: String(password) },
+      semesterId ? parseInt(String(semesterId), 10) : undefined
+    )
     res.json(result)
   } catch (err: unknown) {
     console.error('[/api/v1/jwc/sync-courses] error:', err)
@@ -444,6 +448,164 @@ app.post('/api/v1/jwc/sync-courses', rateLimiter(10), verifyRequestSecurity, asy
       code: 'NETWORK_ERROR',
       message: String((err as Error)?.message || err)
     })
+  }
+})
+
+/**
+ * POST /api/v1/jwc/sync-exams —— 教务考试安排 CAS 代理中转抓取
+ */
+app.post('/api/v1/jwc/sync-exams', rateLimiter(10), verifyRequestSecurity, async (req: Request, res: Response) => {
+  const { username, password, semesterId } = req.body || {}
+  if (!username || !password) {
+    res.status(400).json({ success: false, code: 'INVALID_CREDENTIALS', message: '学号和密码为必填项' })
+    return
+  }
+
+  try {
+    const result = await JwcAuthProxy.fetchExams(
+      { username: String(username), password: String(password) },
+      semesterId ? parseInt(String(semesterId), 10) : undefined
+    )
+    res.json(result)
+  } catch (err: unknown) {
+    console.error('[/api/v1/jwc/sync-exams] error:', err)
+    res.status(500).json({
+      success: false,
+      code: 'NETWORK_ERROR',
+      message: String((err as Error)?.message || err)
+    })
+  }
+})
+
+/**
+ * POST /api/v1/jwc/sync-all —— 教务课表与考试单会话全量抓取
+ */
+app.post('/api/v1/jwc/sync-all', rateLimiter(10), verifyRequestSecurity, async (req: Request, res: Response) => {
+  const { username, password, semesterId } = req.body || {}
+  if (!username || !password) {
+    res.status(400).json({ success: false, code: 'INVALID_CREDENTIALS', message: '学号和密码为必填项' })
+    return
+  }
+
+  try {
+    const result = await JwcAuthProxy.fetchFullData(
+      { username: String(username), password: String(password) },
+      semesterId ? parseInt(String(semesterId), 10) : undefined
+    )
+    res.json(result)
+  } catch (err: unknown) {
+    console.error('[/api/v1/jwc/sync-all] error:', err)
+    res.status(500).json({
+      success: false,
+      code: 'NETWORK_ERROR',
+      message: String((err as Error)?.message || err)
+    })
+  }
+})
+
+// ============ AGC 华为云数据库端点 ============
+
+/**
+ * POST /api/v1/agc/query-courses —— 查询 AGC 云端课表
+ */
+app.post('/api/v1/agc/query-courses', rateLimiter(30), verifyRequestSecurity, async (req: Request, res: Response) => {
+  const { userId, semesterId } = req.body || {}
+  if (!userId) {
+    res.status(400).json({ success: false, message: 'userId 不能为空' })
+    return
+  }
+  try {
+    const courses = await agcCloudDbGateway.queryCourses(
+      String(userId),
+      semesterId ? parseInt(String(semesterId), 10) : undefined
+    )
+    res.json({
+      success: true,
+      message: `从 AGC 云端获取到 ${courses.length} 门课程`,
+      count: courses.length,
+      data: courses,
+      updatedAt: new Date().toLocaleTimeString()
+    })
+  } catch (err: unknown) {
+    res.status(500).json({ success: false, message: String((err as Error)?.message || err) })
+  }
+})
+
+/**
+ * POST /api/v1/agc/upsert-courses —— 推送课程到 AGC 云端
+ */
+app.post('/api/v1/agc/upsert-courses', rateLimiter(30), verifyRequestSecurity, async (req: Request, res: Response) => {
+  const { userId, semesterId, courses } = req.body || {}
+  if (!userId || !Array.isArray(courses)) {
+    res.status(400).json({ success: false, message: 'userId 与 courses 数组为必填项' })
+    return
+  }
+  try {
+    const count = await agcCloudDbGateway.upsertCourses(
+      String(userId),
+      semesterId ? parseInt(String(semesterId), 10) : 523,
+      courses
+    )
+    res.json({
+      success: true,
+      message: `成功同步 ${count} 门课程到 AGC 云数据库`,
+      count,
+      updatedAt: new Date().toLocaleTimeString()
+    })
+  } catch (err: unknown) {
+    res.status(500).json({ success: false, message: String((err as Error)?.message || err) })
+  }
+})
+
+/**
+ * POST /api/v1/agc/query-exams —— 查询 AGC 云端考试
+ */
+app.post('/api/v1/agc/query-exams', rateLimiter(30), verifyRequestSecurity, async (req: Request, res: Response) => {
+  const { userId, semesterId } = req.body || {}
+  if (!userId) {
+    res.status(400).json({ success: false, message: 'userId 不能为空' })
+    return
+  }
+  try {
+    const exams = await agcCloudDbGateway.queryExams(
+      String(userId),
+      semesterId ? parseInt(String(semesterId), 10) : undefined
+    )
+    res.json({
+      success: true,
+      message: `从 AGC 云端获取到 ${exams.length} 门考试安排`,
+      count: exams.length,
+      data: exams,
+      updatedAt: new Date().toLocaleTimeString()
+    })
+  } catch (err: unknown) {
+    res.status(500).json({ success: false, message: String((err as Error)?.message || err) })
+  }
+})
+
+/**
+ * POST /api/v1/agc/upsert-exams —— 推送考试到 AGC 云端
+ */
+app.post('/api/v1/agc/upsert-exams', rateLimiter(30), verifyRequestSecurity, async (req: Request, res: Response) => {
+  const { userId, semesterId, exams } = req.body || {}
+  if (!userId || !Array.isArray(exams)) {
+    res.status(400).json({ success: false, message: 'userId 与 exams 数组为必填项' })
+    return
+  }
+  try {
+    const count = await agcCloudDbGateway.upsertExams(
+      String(userId),
+      semesterId ? parseInt(String(semesterId), 10) : 523,
+      exams
+    )
+    res.json({
+      success: true,
+      message: `成功同步 ${count} 门考试安排到 AGC 云数据库`,
+      count,
+      updatedAt: new Date().toLocaleTimeString()
+    })
+  } catch (err: unknown) {
+    res.status(500).json({ success: false, message: String((err as Error)?.message || err) })
   }
 })
 
