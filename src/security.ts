@@ -84,6 +84,13 @@ export function verifyRequestSecurity(req: Request, res: Response, next: NextFun
     return
   }
 
+  // 3. Web/PWA 公共只读与学生自服务端点放行（已由 rateLimiter 保护）
+  const publicPaths = ['/api/v1/knowledge', '/api/v1/config', '/api/v1/jwc', '/api/jwc']
+  if (publicPaths.some(prefix => req.path.startsWith(prefix))) {
+    next()
+    return
+  }
+
   // 若无密钥配置且在开发环境中，允许通过，但给出警告
   if (!PROXY_AUTH_KEY && process.env.NODE_ENV !== 'production') {
     next()

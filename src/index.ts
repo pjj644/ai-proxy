@@ -2,6 +2,7 @@ import 'dotenv/config'
 import fs from 'fs'
 import path from 'path'
 import express, { Request, Response } from 'express'
+import cors from 'cors'
 import { fileURLToPath } from 'url'
 import { HumanMessage } from '@langchain/core/messages'
 import { Command } from '@langchain/langgraph'
@@ -12,6 +13,7 @@ import { parseScheduleFromImage, parseVisionFromImage, VisionMode } from './visi
 import { campusKnowledge } from './knowledge/store'
 import { buildBusSchedulePayload, buildGuidesPayload } from './knowledge/api'
 import { searchJwcWebsite } from './jwcScraper'
+import { JwcAuthProxy } from './jwcAuthProxy'
 import { preprocessInput } from './preprocess'
 import { scrubThoughtTags, maskSensitiveInfo } from './postprocess'
 import type { ToolCallReq, ToolCallWithMeta, TurnTelemetry } from './types'
@@ -22,6 +24,11 @@ const __dirname = path.dirname(__filename)
 import { verifyRequestSecurity, rateLimiter, validatePayloadBoundaries } from './security'
 
 const app = express()
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'x-proxy-key', 'x-timestamp', 'x-nonce', 'x-signature', 'Authorization']
+}))
 app.use(express.json({ limit: '8mb' }))
 
 const PORT: number = parseInt(process.env.PORT || '3000', 10)
@@ -413,6 +420,30 @@ app.get('/api/jwc/search', rateLimiter(30), verifyRequestSecurity, async (req: R
     res.json(result)
   } catch (error: unknown) {
     res.status(500).json({ success: false, total: 0, notices: [], error: String((error as Error)?.message || error) })
+  }
+})
+
+/**
+ * POST /api/v1/jwc/sync-courses —— 教务课表 CAS 代理中转抓取
+ * 接收 { username, password }，内存中转后即弃，零本地存储。
+ */
+app.post('/api/v1/jwc/sync-courses', rateLimiter(10), verifyRequestSecurity, async (req: Request, res: Response) => {
+  const { username, password } = req.body || {}
+  if (!username || !password) {
+    res.status(400).json({ success: false, code: 'INVALID_CREDENTIALS', message: '学号和密码为必填项' })
+    return
+  }
+
+  try {
+    const result = await JwcAuthProxy.fetchCourses({ username: String(username), password: String(password) })
+    res.json(result)
+  } catch (err: unknown) {
+    console.error('[/api/v1/jwc/sync-courses] error:', err)
+    res.status(500).json({
+      success: false,
+      code: 'NETWORK_ERROR',
+      message: String((err as Error)?.message || err)
+    })
   }
 })
 
