@@ -16,6 +16,12 @@ export interface ToolMeta {
   riskLevel: 'low' | 'medium' | 'high'
 }
 
+/**
+ * 工具风险元数据：与端侧 ToolRegistry.ets 的工具名清单严格对齐（三处同步铁律），
+ * 仅覆盖端侧真实注册的 5 大元工具、4 个辅助工具与 29 个别名。
+ * 端侧不存在的旧别名（如 add_to_calendar/check_time_conflict 等）已移除——
+ * 若模型幻觉下发，经 getToolMeta 的 fail-closed 兜底与端侧哨兵双重拦截。
+ */
 export const toolMeta: Record<string, ToolMeta> = {
   // 5 大核心元工具
   app_data_query: { requiresConfirmation: false, riskLevel: 'low' },
@@ -40,7 +46,6 @@ export const toolMeta: Record<string, ToolMeta> = {
   query_gpa: { requiresConfirmation: false, riskLevel: 'low' },
   query_schedule: { requiresConfirmation: false, riskLevel: 'low' },
   check_login_status: { requiresConfirmation: false, riskLevel: 'low' },
-  check_time_conflict: { requiresConfirmation: false, riskLevel: 'low' },
   query_reminder_settings: { requiresConfirmation: false, riskLevel: 'low' },
   has_course_data: { requiresConfirmation: false, riskLevel: 'low' },
   create_schedule: { requiresConfirmation: true, riskLevel: 'medium' },
@@ -58,10 +63,6 @@ export const toolMeta: Record<string, ToolMeta> = {
   query_tomorrow_courses: { requiresConfirmation: false, riskLevel: 'low' },
   query_course_by_name: { requiresConfirmation: false, riskLevel: 'low' },
   list_calendar_events: { requiresConfirmation: false, riskLevel: 'low' },
-  add_to_calendar: { requiresConfirmation: true, riskLevel: 'medium' },
-  add_exam_to_calendar: { requiresConfirmation: true, riskLevel: 'medium' },
-  add_course_to_calendar: { requiresConfirmation: true, riskLevel: 'medium' },
-  remove_calendar_event: { requiresConfirmation: true, riskLevel: 'medium' },
   update_schedule: { requiresConfirmation: true, riskLevel: 'medium' },
   query_campus_guide: { requiresConfirmation: false, riskLevel: 'low' },
   search_jwc_news: { requiresConfirmation: false, riskLevel: 'low' },
