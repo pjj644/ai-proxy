@@ -56,296 +56,6 @@ interface CloudDbStore {
   exams: AgcExamRecord[]
 }
 
-// 华为 AGC 云端 523 学期 (2026-2027第一学期) 真实教务课表数据集 (提取自 image.png)
-function getPresetSemester523Courses(): AgcCourseRecord[] {
-  const users = ['pjj644@users.noreply.github.com', '1930551261015334656', 'student_demo_id', 'seed_user']
-  const realCourses = [
-    {
-      courseId: 'G0105180.02',
-      courseName: '数字逻辑与处理器系统',
-      teacherName: '杨峰',
-      roomName: '品学楼 A410',
-      dayOfWeek: 1,
-      startSection: 1,
-      duration: 2,
-      validWeeks: '连1-15周',
-      stepWeeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-      colorIndex: 0
-    },
-    {
-      courseId: 'M1801230.18',
-      courseName: '马克思主义基本原理',
-      teacherName: '张晓云',
-      roomName: '品学楼 B312',
-      dayOfWeek: 1,
-      startSection: 3,
-      duration: 2,
-      validWeeks: '连1-11周',
-      stepWeeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-      colorIndex: 1
-    },
-    {
-      courseId: 'W0100940.03',
-      courseName: '网络算法基础 (挑战性课程)',
-      teacherName: '林蓉平',
-      roomName: '品学楼 C402-B',
-      dayOfWeek: 1,
-      startSection: 5,
-      duration: 2,
-      validWeeks: '连1-16周',
-      stepWeeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-      colorIndex: 2
-    },
-    {
-      courseId: 'D1200440.05',
-      courseName: '大学物理Ⅱ',
-      teacherName: '张修明',
-      roomName: '立人楼 B105',
-      dayOfWeek: 2,
-      startSection: 1,
-      duration: 2,
-      validWeeks: '连1-17周',
-      stepWeeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-      colorIndex: 3
-    },
-    {
-      courseId: 'D1100735.05',
-      courseName: '概率论与数理统计',
-      teacherName: '陈碟',
-      roomName: '品学楼 B303',
-      dayOfWeek: 2,
-      startSection: 3,
-      duration: 2,
-      validWeeks: '连1-15周',
-      stepWeeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-      colorIndex: 4
-    },
-    {
-      courseId: 'M1800910.01',
-      courseName: '改革开放史专题讲座',
-      teacherName: '丁玉峰',
-      roomName: '品学楼 A101',
-      dayOfWeek: 2,
-      startSection: 9,
-      duration: 2,
-      validWeeks: '连1-6周',
-      stepWeeks: [1, 2, 3, 4, 5, 6],
-      colorIndex: 5
-    },
-    {
-      courseId: 'W0100940.03',
-      courseName: '网络算法基础 (挑战性课程)',
-      teacherName: '林蓉平',
-      roomName: '品学楼 C402-B',
-      dayOfWeek: 3,
-      startSection: 1,
-      duration: 2,
-      validWeeks: '连1-16周',
-      stepWeeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-      colorIndex: 2
-    },
-    {
-      courseId: 'M2000810.03',
-      courseName: '板式网球 C',
-      teacherName: '彭晓瑭',
-      roomName: '体育场地',
-      dayOfWeek: 3,
-      startSection: 3,
-      duration: 2,
-      validWeeks: '连3-18周',
-      stepWeeks: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
-      colorIndex: 6
-    },
-    {
-      courseId: 'G0105180.02',
-      courseName: '数字逻辑与处理器系统',
-      teacherName: '杨峰',
-      roomName: '品学楼 A410',
-      dayOfWeek: 3,
-      startSection: 5,
-      duration: 2,
-      validWeeks: '连1-14周',
-      stepWeeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-      colorIndex: 0
-    },
-    {
-      courseId: 'S1214710.66',
-      courseName: '大学物理实验Ⅰ',
-      teacherName: '于景侠',
-      roomName: '物电学院实验室5',
-      dayOfWeek: 3,
-      startSection: 7,
-      duration: 2,
-      validWeeks: '单1-9周',
-      stepWeeks: [1, 3, 5, 7, 9],
-      colorIndex: 7
-    },
-    {
-      courseId: 'G0105180.02',
-      courseName: '数字逻辑与处理器系统',
-      teacherName: '杨峰',
-      roomName: '品学楼 A410',
-      dayOfWeek: 4,
-      startSection: 1,
-      duration: 2,
-      validWeeks: '双2-14周',
-      stepWeeks: [2, 4, 6, 8, 10, 12, 14],
-      colorIndex: 0
-    },
-    {
-      courseId: 'D1200440.05',
-      courseName: '大学物理Ⅱ',
-      teacherName: '张修明',
-      roomName: '立人楼 B105',
-      dayOfWeek: 4,
-      startSection: 3,
-      duration: 2,
-      validWeeks: '连1-4 连6-16周',
-      stepWeeks: [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-      colorIndex: 3
-    },
-    {
-      courseId: 'M1801230.18',
-      courseName: '马克思主义基本原理',
-      teacherName: '张晓云',
-      roomName: '品学楼 B312',
-      dayOfWeek: 4,
-      startSection: 5,
-      duration: 2,
-      validWeeks: '连1-4 连6-10周',
-      stepWeeks: [1, 2, 3, 4, 6, 7, 8, 9, 10],
-      colorIndex: 1
-    },
-    {
-      courseId: 'A0419520.73',
-      courseName: '机器人设计与制作',
-      teacherName: '骆德渊/孙锐/吴军',
-      roomName: '品学楼 A209 / 网上虚拟教室',
-      dayOfWeek: 4,
-      startSection: 9,
-      duration: 2,
-      validWeeks: '1,2,3-4,6-7,8,9-17周',
-      stepWeeks: [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-      colorIndex: 5
-    },
-    {
-      courseId: 'D1100735.05',
-      courseName: '概率论与数理统计',
-      teacherName: '陈碟',
-      roomName: '品学楼 B303',
-      dayOfWeek: 5,
-      startSection: 1,
-      duration: 2,
-      validWeeks: '连1-3 连6-15周',
-      stepWeeks: [1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-      colorIndex: 4
-    },
-    {
-      courseId: 'G0105180.02',
-      courseName: '数字逻辑与处理器系统',
-      teacherName: '杨峰',
-      roomName: '品学楼 A410',
-      dayOfWeek: 5,
-      startSection: 3,
-      duration: 2,
-      validWeeks: '连1-3 连6-14周',
-      stepWeeks: [1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-      colorIndex: 0
-    },
-    {
-      courseId: 'G0105180.02',
-      courseName: '数字逻辑与处理器系统 (实验)',
-      teacherName: '汪玲',
-      roomName: '科研楼 B239',
-      dayOfWeek: 5,
-      startSection: 7,
-      duration: 2,
-      validWeeks: '连7-14周',
-      stepWeeks: [7, 8, 9, 10, 11, 12, 13, 14],
-      colorIndex: 0
-    }
-  ]
-
-  const result: AgcCourseRecord[] = []
-  let globalId = 1
-  for (const uid of users) {
-    for (const c of realCourses) {
-      result.push({
-        id: globalId++,
-        userId: uid,
-        semesterId: 523,
-        semesterLabel: '2026-2027学年 第一学期',
-        ...c,
-        updatedAt: 1724736000000
-      })
-    }
-  }
-  return result
-}
-
-// 华为 AGC 云端 523 学期真实考试排期数据集
-function getPresetSemester523Exams(): AgcExamRecord[] {
-  const users = ['pjj644@users.noreply.github.com', '1930551261015334656', 'student_demo_id', 'seed_user']
-  const baseExams = [
-    {
-      courseNo: 'G0105180.02',
-      courseName: '数字逻辑与处理器系统',
-      examDate: '2027-01-08',
-      examTimeRange: '09:00-11:00',
-      examLocation: '品学楼 A410',
-      seatNo: '24号',
-      examStatus: '未开始',
-      examType: '期末考试'
-    },
-    {
-      courseNo: 'D1200440.05',
-      courseName: '大学物理Ⅱ',
-      examDate: '2027-01-11',
-      examTimeRange: '14:30-16:30',
-      examLocation: '立人楼 B105',
-      seatNo: '18号',
-      examStatus: '未开始',
-      examType: '期末考试'
-    },
-    {
-      courseNo: 'D1100735.05',
-      courseName: '概率论与数理统计',
-      examDate: '2027-01-14',
-      examTimeRange: '09:00-11:00',
-      examLocation: '品学楼 B303',
-      seatNo: '09号',
-      examStatus: '未开始',
-      examType: '期末考试'
-    },
-    {
-      courseNo: 'W0100940.03',
-      courseName: '网络算法基础 (挑战性课程)',
-      examDate: '2027-01-16',
-      examTimeRange: '14:30-16:30',
-      examLocation: '品学楼 C402-B',
-      seatNo: '35号',
-      examStatus: '未开始',
-      examType: '期末考试'
-    }
-  ]
-
-  const result: AgcExamRecord[] = []
-  let globalId = 1
-  for (const uid of users) {
-    for (const e of baseExams) {
-      result.push({
-        id: globalId++,
-        userId: uid,
-        semesterId: 523,
-        semesterLabel: '2026-2027学年 第一学期',
-        ...e,
-        updatedAt: 1724736000000
-      })
-    }
-  }
-  return result
-}
-
 class AgcCloudDbGateway {
   private store: CloudDbStore = { courses: [], exams: [] }
   private initialized = false
@@ -369,17 +79,6 @@ class AgcCloudDbGateway {
         this.store = { courses: [], exams: [] }
       }
     }
-
-    // 确保云数据库包含 523 学期的真实云端数据 (提取自 image.png)
-    const has523Courses = this.store.courses && this.store.courses.some(c => c.semesterId === 523 && c.courseName === '数字逻辑与处理器系统')
-    if (!has523Courses) {
-      const presetCourses = getPresetSemester523Courses()
-      const presetExams = getPresetSemester523Exams()
-      this.store.courses = presetCourses
-      this.store.exams = presetExams
-      this.saveStore()
-    }
-
     this.initialized = true
   }
 
@@ -393,16 +92,31 @@ class AgcCloudDbGateway {
   }
 
   /**
-   * 检查用户标识是否匹配（支持邮箱、UID、学号互通）
+   * 最近一次查询的数据来源（cloud = 华为云函数真实命中；mirror = 本地镜像仓储）
+   */
+  private lastQuerySource: 'cloud' | 'mirror' = 'mirror'
+
+  getLastQuerySource(): 'cloud' | 'mirror' {
+    return this.lastQuerySource
+  }
+
+  /** 调用云函数时可选的访问密钥（与云函数环境变量 SYNC_ACCESS_KEY 配对） */
+  private buildCloudBody(payload: Record<string, unknown>): Record<string, unknown> {
+    const syncKey = process.env.AGC_SYNC_KEY
+    const body = { ...payload }
+    if (syncKey) {
+      ;(body as any).syncAccessKey = syncKey
+    }
+    // 发往云函数前做白名单裁剪，确保与 ClassCourse/ClassExam Schema 一致
+    return body
+  }
+
+  /**
+   * 检查用户标识是否匹配（严格相等；统一以华为 AGC 数字 UID 为准）
    */
   private matchUser(recordUserId: string, targetUserId: string): boolean {
     if (!recordUserId || !targetUserId) return false
-    if (recordUserId === targetUserId) return true
-    const knownGroup = ['pjj644@users.noreply.github.com', '1930551261015334656', 'student_demo_id', 'seed_user']
-    if (knownGroup.includes(recordUserId) && knownGroup.includes(targetUserId)) {
-      return true
-    }
-    return false
+    return recordUserId === targetUserId
   }
 
   /**
@@ -418,24 +132,26 @@ class AgcCloudDbGateway {
         const response = await fetch(cloudFunctionUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: JSON.stringify(this.buildCloudBody({
             action: 'queryCourses',
             userId,
             semesterId: targetSemesterId
-          })
+          }))
         })
         if (response.ok) {
           const resJson: any = await response.json()
           if (resJson.success && Array.isArray(resJson.data)) {
             console.log(`[AgcCloudDbGateway] 成功从华为 AGC 线上云函数获取到 ${resJson.data.length} 条真实课程`)
+            this.lastQuerySource = 'cloud'
             return resJson.data
           }
         }
       } catch (err) {
-        console.error('[AgcCloudDbGateway] 请求华为 AGC 云函数失败，平滑切换至真实仓储:', err)
+        console.error('[AgcCloudDbGateway] 请求华为 AGC 云函数失败，回退至本地镜像仓储:', err)
       }
     }
 
+    this.lastQuerySource = 'mirror'
     this.loadStore()
     const rawRecords = this.store.courses.filter(
       c => this.matchUser(c.userId, userId) && (!targetSemesterId || c.semesterId === targetSemesterId)
@@ -462,15 +178,29 @@ class AgcCloudDbGateway {
     if (cloudFunctionUrl) {
       try {
         console.log(`[AgcCloudDbGateway] 正在向华为 AGC 线上云函数推送覆盖课表: ${cloudFunctionUrl}`)
+        // 与 ClassCourse Schema 对齐的白名单裁剪（stepWeeks 等多余字段会被云端拒绝）
+        const records = (Array.isArray(courses) ? courses : []).map((c: any) => ({
+          userId,
+          semesterId,
+          courseId: String(c.courseId || c.id || c.name || ''),
+          courseName: String(c.courseName || c.name || ''),
+          teacherName: c.teacherName || null,
+          roomName: c.roomName || null,
+          dayOfWeek: Number(c.dayOfWeek || c.time?.dayOfWeek) || 1,
+          startSection: Number(c.startSection || c.time?.startSection) || 1,
+          duration: Number(c.duration || c.time?.duration) || 1,
+          validWeeks: c.validWeeks || '',
+          colorIndex: Number(c.colorIndex ?? 0) || 0
+        }))
         await fetch(cloudFunctionUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: JSON.stringify(this.buildCloudBody({
             action: 'upsertCourses',
             userId,
             semesterId,
-            courses
-          })
+            courses: records
+          }))
         })
       } catch (err) {
         console.error('[AgcCloudDbGateway] 推送华为 AGC 云函数失败:', err)
@@ -531,15 +261,16 @@ class AgcCloudDbGateway {
         const response = await fetch(cloudFunctionUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: JSON.stringify(this.buildCloudBody({
             action: 'queryExams',
             userId,
             semesterId: targetSemesterId
-          })
+          }))
         })
         if (response.ok) {
           const resJson: any = await response.json()
           if (resJson.success && Array.isArray(resJson.data)) {
+            this.lastQuerySource = 'cloud'
             return resJson.data
           }
         }
@@ -548,6 +279,7 @@ class AgcCloudDbGateway {
       }
     }
 
+    this.lastQuerySource = 'mirror'
     this.loadStore()
     const rawRecords = this.store.exams.filter(
       e => this.matchUser(e.userId, userId) && (!targetSemesterId || e.semesterId === targetSemesterId)
@@ -573,15 +305,28 @@ class AgcCloudDbGateway {
     const cloudFunctionUrl = process.env.AGC_CLOUD_FUNCTION_URL
     if (cloudFunctionUrl) {
       try {
+        // 与 ClassExam Schema 对齐的白名单裁剪
+        const records = (Array.isArray(exams) ? exams : []).map((e: any) => ({
+          userId,
+          semesterId,
+          courseNo: e.courseNo || e.id || null,
+          courseName: String(e.courseName || e.name || ''),
+          examDate: e.examDate || null,
+          examTimeRange: e.examTimeRange || e.examTime || null,
+          examLocation: e.examLocation || e.roomName || null,
+          seatNo: e.seatNo || null,
+          examStatus: e.examStatus || e.status || null,
+          examType: e.examType || '期末考试'
+        }))
         await fetch(cloudFunctionUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: JSON.stringify(this.buildCloudBody({
             action: 'upsertExams',
             userId,
             semesterId,
-            exams
-          })
+            exams: records
+          }))
         })
       } catch (err) {
         console.error('[AgcCloudDbGateway] 推送考试到华为 AGC 云函数失败:', err)

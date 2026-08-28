@@ -524,6 +524,7 @@ app.post('/api/v1/agc/query-courses', rateLimiter(30), verifyRequestSecurity, as
       message: `从 AGC 云端获取到 ${courses.length} 门课程`,
       count: courses.length,
       data: courses,
+      source: agcCloudDbGateway.getLastQuerySource(),
       updatedAt: new Date().toLocaleTimeString()
     })
   } catch (err: unknown) {
@@ -576,6 +577,7 @@ app.post('/api/v1/agc/query-exams', rateLimiter(30), verifyRequestSecurity, asyn
       message: `从 AGC 云端获取到 ${exams.length} 门考试安排`,
       count: exams.length,
       data: exams,
+      source: agcCloudDbGateway.getLastQuerySource(),
       updatedAt: new Date().toLocaleTimeString()
     })
   } catch (err: unknown) {
