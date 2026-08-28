@@ -15,6 +15,7 @@ import { buildBusSchedulePayload, buildGuidesPayload } from './knowledge/api'
 import { searchJwcWebsite } from './jwcScraper'
 import { JwcAuthProxy } from './jwcAuthProxy'
 import { agcCloudDbGateway } from './agcGateway'
+import { listNotices, createNotice, deleteNotice, validateNoticeInput } from './notifications'
 import { preprocessInput } from './preprocess'
 import { scrubThoughtTags, maskSensitiveInfo } from './postprocess'
 import type { ToolCallReq, ToolCallWithMeta, TurnTelemetry } from './types'
@@ -27,7 +28,7 @@ import { verifyRequestSecurity, rateLimiter, validatePayloadBoundaries } from '.
 const app = express()
 app.use(cors({
   origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-proxy-key', 'x-timestamp', 'x-nonce', 'x-signature', 'Authorization']
 }))
 app.use(express.json({ limit: '8mb' }))
@@ -609,6 +610,50 @@ app.post('/api/v1/agc/upsert-exams', rateLimiter(30), verifyRequestSecurity, asy
   } catch (err: unknown) {
     res.status(500).json({ success: false, message: String((err as Error)?.message || err) })
   }
+})
+
+// ============ 简单通知端点（设置页「消息通知」开关消费链路） ============
+
+/**
+ * GET /api/v1/notifications —— 客户端拉取通知（?since=<id> 增量拉取 id 大于 since 的通知）
+ */
+app.get('/api/v1/notifications', rateLimiter(60), verifyRequestSecurity, (req: Request, res: Response) => {
+  const rawSince = req.query.since
+  const sinceId = typeof rawSince === 'string' ? parseInt(rawSince, 10) : 0
+  const data = listNotices(Number.isFinite(sinceId) && sinceId > 0 ? sinceId : 0)
+  res.json({ ok: true, count: data.length, data })
+})
+
+/**
+ * POST /api/v1/admin/notifications —— 发布一条简单通知（与客户端共用 x-proxy-key 鉴权；
+ * 自托管部署无独立后台，发布走 curl / HTTP 工具即可）
+ */
+app.post('/api/v1/admin/notifications', rateLimiter(10), verifyRequestSecurity, (req: Request, res: Response) => {
+  const { title, content } = req.body || {}
+  const invalid = validateNoticeInput(title, content)
+  if (invalid) {
+    res.status(400).json({ ok: false, message: invalid })
+    return
+  }
+  const record = createNotice(String(title).trim(), String(content).trim())
+  res.json({ ok: true, data: record })
+})
+
+/**
+ * DELETE /api/v1/admin/notifications/:id —— 撤回一条通知
+ */
+app.delete('/api/v1/admin/notifications/:id', rateLimiter(10), verifyRequestSecurity, (req: Request, res: Response) => {
+  const id = parseInt(String(req.params.id), 10)
+  if (!Number.isFinite(id)) {
+    res.status(400).json({ ok: false, message: 'id 必须为整数' })
+    return
+  }
+  const removed = deleteNotice(id)
+  if (!removed) {
+    res.status(404).json({ ok: false, message: `通知 ${id} 不存在` })
+    return
+  }
+  res.json({ ok: true, message: `通知 ${id} 已删除` })
 })
 
 app.listen(PORT, () => {
