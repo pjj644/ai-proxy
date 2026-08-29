@@ -245,12 +245,12 @@ export const tools: StructuredTool[] = [
   }),
   tool(deviceStub, {
     name: 'execute_page_action',
-    description: '在当前页面触发 UI 交互动作（如切换周次、切换Tab、触发导入、显示聚光灯高亮引导等）或指导用户操作。',
+    description: '在当前页面触发 UI 交互动作（如切换周次、切换Tab、触发导入、打开外部网页、显示聚光灯高亮引导等）或指导用户操作。注意：聚光灯高亮仅支持 get_current_page_context 返回的 highlightableIds 中列出的元素，其余 id 一律会被端侧拒绝。',
     schema: z.object({
       action: z
         .string()
-        .describe('动作类型：switch_week(切换周次), switch_tab(切换Tab), import_courses(导入课表), import_grades(导入成绩), import_exams(导入考试), show_guidance(高亮聚光灯引导)'),
-      params: z.record(z.string(), z.any()).optional().describe('动作参数，如 { week: 5 }, { targetElementId: "import_btn", hintText: "点击这里导入" }'),
+        .describe('动作类型：switch_week(切换周次), switch_tab(切换Tab), import_courses(导入课表), import_grades(导入成绩), import_exams(导入考试), web(打开外部网页,需params.url), show_guidance(聚光灯高亮引导)'),
+      params: z.record(z.string(), z.any()).optional().describe('动作参数，如 { week: 5 }, { url: "https://...", title: "校园地图" }, { targetElementId: "<必须取自 get_current_page_context 返回的 highlightableIds>", hintText: "点击这里" }，show_guidance 的 targetElementId 严禁编造'),
     }),
   }),
 ]
