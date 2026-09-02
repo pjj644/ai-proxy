@@ -1,24 +1,8 @@
-import fs from 'fs'
 import crypto from 'crypto'
 import * as cheerio from 'cheerio'
 
-const tempEnvPath = 'D:\\harmony\\helper_app\\temp\\.env'
-let username = ''
-let password = ''
-
-try {
-  const content = fs.readFileSync(tempEnvPath, 'utf-8')
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim()
-    if (trimmed.startsWith('account:')) {
-      username = trimmed.substring('account:'.length).trim()
-    } else if (trimmed.startsWith('password:')) {
-      password = trimmed.substring('password:'.length).trim()
-    }
-  }
-} catch (e) {
-  console.error('Failed to read temp .env:', e)
-}
+const username = process.env.TEST_CAS_USER || ''
+const password = process.env.TEST_CAS_PWD || ''
 
 function encryptCasPassword(pwd: string, salt: string): string {
   if (!salt) return pwd

@@ -56,7 +56,10 @@ export async function parseVisionFromImage(
   mode: VisionMode = 'schedule',
   userHint?: string,
 ): Promise<VisionResult> {
-  const apiKey = process.env.ZHIPU_API_KEY || 'YOUR_ZHIPU_API_KEY'
+  const apiKey = process.env.ZHIPU_API_KEY || ''
+  if (!apiKey) {
+    throw new Error('[Vision] ZHIPU_API_KEY is not configured in environment variables')
+  }
   const baseURL = process.env.ZHIPU_BASE_URL || 'https://open.bigmodel.cn/api/paas/v4'
   const model = process.env.ZHIPU_VISION_MODEL || 'glm-4v-plus'
 

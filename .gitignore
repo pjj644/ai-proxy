@@ -4,3 +4,4 @@ dist/
 checkpoints.sqlite*
 *.log
 data/
+web-client/

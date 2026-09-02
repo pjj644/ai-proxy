@@ -33,8 +33,41 @@ app.use(cors({
 }))
 app.use(express.json({ limit: '8mb' }))
 
+// 支持 Cloudflared 隧道 /ai 路径前缀无缝分流
+app.use((req: Request, _res: Response, next) => {
+  if (req.url.startsWith('/ai/')) {
+    req.url = req.url.slice(3)
+  } else if (req.url === '/ai') {
+    req.url = '/'
+  }
+  next()
+})
+
 const PORT: number = parseInt(process.env.PORT || '3000', 10)
 const PROXY_AUTH_KEY: string = process.env.PROXY_AUTH_KEY || ''
+
+// 根路径健康说明
+app.get('/', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    service: 'ai-proxy',
+    message: 'UESTC Helper AI Assistant API is running',
+    timestamp: Date.now(),
+  })
+})
+
+// 安全挂载 Web 端 AI 对话客户端（独立隔离，发生任何文件变动均不影响核心 API）
+try {
+  const webClientDir = path.resolve(__dirname, '../web-client')
+  if (fs.existsSync(webClientDir)) {
+    app.use('/web', express.static(webClientDir, { index: 'index.html' }))
+    app.get('/web', (_req: Request, res: Response) => {
+      res.redirect('/web/')
+    })
+  }
+} catch (webErr) {
+  console.warn('[web-client] Failed to mount static web client:', webErr)
+}
 
 // 会话并发互斥锁（防止同一个 session_id 并发触发图导致状态冲突）
 const activeSessionLocks = new Set<string>()
